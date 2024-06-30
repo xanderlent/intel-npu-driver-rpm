@@ -1,0 +1,7 @@
+# Ignore linux-npu-driver tarballs
+/v*.tar.gz
+# Ignore vpux_elf aka npu_elf tarballs
+/npu_ud_*.tar.gz
+# Ignore level-zero-npu-extensions aka level-zero-vpu-extensions tarballs
+# Is there really no better way to glob a commit hash of exactly 40 hex chars?
+/[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9].tar.gz

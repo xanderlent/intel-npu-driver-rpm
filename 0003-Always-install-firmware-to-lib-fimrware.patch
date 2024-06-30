@@ -1,0 +1,30 @@
+From 580fccc7beb523b808387be1c3472a5949578452 Mon Sep 17 00:00:00 2001
+From: "Alexander F. Lent" <lx@xanderlent.com>
+Date: Sun, 30 Jun 2024 14:49:34 -0400
+Subject: [PATCH 3/3] Always install firmware to lib/fimrware
+
+(The existing solution using the CMAKE_INSTALL_LIBDIR variable gives
+the wrong result on systems like Fedora where noarch files and 32-bit
+libraries live in lib and 64-bit libraries live in lib64.)
+
+Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
+---
+ firmware/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/firmware/CMakeLists.txt b/firmware/CMakeLists.txt
+index 8842327..22d86f0 100644
+--- a/firmware/CMakeLists.txt
++++ b/firmware/CMakeLists.txt
+@@ -14,7 +14,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE include)
+ file(GLOB FIRMWARE_BINARIES ${CMAKE_CURRENT_SOURCE_DIR}/bin/*.bin)
+ if (FIRMWARE_BINARIES)
+   install(FILES ${FIRMWARE_BINARIES}
+-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/firmware/updates/intel/vpu/
++    DESTINATION lib/firmware/updates/intel/vpu/
+     PERMISSIONS OWNER_READ
+     COMPONENT fw-npu)
+ endif()
+-- 
+2.45.2
+
