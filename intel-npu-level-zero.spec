@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.5.0
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -16,6 +16,7 @@ Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_ext
 %define npu_elf_version npu_ud_2024_24_rc1
 # v1.5.0 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which is tagged npu_ud_2024_24_rc1
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/refs/tags/%{npu_elf_version}.tar.gz
+Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
 Patch:		0001-Fix-the-compilation-issues-from-gcc-14.patch
 Patch:		0002-Disable-third-party-googletest-and-yaml-cpp.patch
 Patch:		0003-Always-install-firmware-to-lib-fimrware.patch
@@ -101,6 +102,8 @@ cp third_party/level-zero-vpu-extensions/LICENSE.txt LICENSE-level-zero-vpu-exte
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
+rm firmware/bin/vpu_37xx_v0.0.bin
+cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 # Upstream commit ffdc049ca41ad7d8c9555fa95760b7a9f44494a5
 # Should appear in the next release, fixes bugs revealed by gcc 14
 %patch -P 0 -p1
@@ -142,6 +145,8 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
+* Mon Jul 1 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-3
+- Fix vpu_37xx_v0.0.bin being a Git LFS pointer, replace it with the real blob
 * Mon Jul 1 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-2
 - Fix build broken by incorrect paths in various last-minute additions
 * Sun Jun 30 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-1
