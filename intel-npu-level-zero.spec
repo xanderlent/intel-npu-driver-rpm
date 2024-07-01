@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.5.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -96,7 +96,7 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 %setup -q -n linux-npu-driver-%{version} -T -D -a 1
 rmdir third_party/level-zero-vpu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-vpu-extensions/
-cp third_party/level-zero-vpu-extensions/LICENSE.md LICENSE-level-zero-vpu-extensions.md
+cp third_party/level-zero-vpu-extensions/LICENSE.txt LICENSE-level-zero-vpu-extensions.txt
 %setup -q -n linux-npu-driver-%{version} -T -D -a 2
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
@@ -121,7 +121,7 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 %cmake_install
 
 %files
-%license LICENSE.md third-party-programs.txt LICENSE-level-zero-vpu-extensions.md LICENSE-vpux_elf
+%license LICENSE.md third-party-programs.txt LICENSE-level-zero-vpu-extensions.txt LICENSE-vpux_elf
 # TODO: Also include the RPM repo readme?
 %doc README.md docs/overview.md security.md
 # TODO: Does the unversioned library belong in a -devel package?
@@ -135,12 +135,14 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 %files -n intel-npu-firmware
 %license firmware/bin/COPYRIGHT
-lib/firmware/updates/intel/vpu/*.bin
+/usr/lib/firmware/updates/intel/vpu/*.bin
 
 %check
 %ctest
 
 
 %changelog
+* Mon Jul 1 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-2
+- Fix build broken by incorrect paths in various last-minute additions
 * Sun Jun 30 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-1
 - Intial Release
