@@ -1,7 +1,7 @@
 From 94814b31bede8b18f8eaef1dbdede71dd7ce5944 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 30 Jun 2024 14:49:34 -0400
-Subject: [PATCH 3/4] Always install firmware to /lib/firmware
+Subject: [PATCH 3/3] Always install firmware to /lib/firmware
 
 (The existing solution using the CMAKE_INSTALL_LIBDIR variable gives
 the wrong result on systems like Fedora where noarch files and 32-bit

@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.5.0
-Release:	4%{?dist}
+Release:	5%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -20,7 +20,6 @@ Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/
 Patch:		0001-Fix-the-compilation-issues-from-gcc-14.patch
 Patch:		0002-Disable-third-party-googletest-and-yaml-cpp.patch
 Patch:		0003-Always-install-firmware-to-lib-firmware.patch
-Patch:		0004-Install-firmware-to-lib-firmware-instead-of-lib-firm.patch
 
 # TODO: Can this build on non-x86?
 ExclusiveArch:	i686 x86_64
@@ -115,9 +114,6 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 # Patch CMAKE_INSTALL_LIBDIR to lib/ for firmware
 # TODO: Propose this patch to upstream; normally the usage is good but firmware is noarch and so lives with 32-bit code in the 'default' location
 %patch -P 2 -p1
-# Patch firmware install to go directly to /lib/firmware and not /lib/firmware/updates
-# dracut doesn't pick up the firmware from /updates for some reason
-%patch -P 3 -p1
 
 
 %build
@@ -143,13 +139,16 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 %files -n intel-npu-firmware
 %license firmware/bin/COPYRIGHT
-/usr/lib/firmware/intel/vpu/*.bin
+/usr/lib/firmware/updates/intel
 
 %check
 %ctest
 
 
 %changelog
+* Thu Jul 4 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-5
+- Revert firmware location change, it seems like a deeper bug
+- Attempt to also own the other directories that we install like /lib/firmware/updates/intel (etc)
 * Thu Jul 4 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-4
 - Fix dracut not picking up the NPU/VPU firmware
 - Fix a typo in the firmware patch name

@@ -1,7 +1,7 @@
 From 744ca22d5a31b57e9bdfe44223824b88378dac5f Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 30 Jun 2024 12:48:55 -0400
-Subject: [PATCH 2/4] Disable third-party googletest and yaml-cpp
+Subject: [PATCH 2/3] Disable third-party googletest and yaml-cpp
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
