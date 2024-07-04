@@ -5,3 +5,5 @@
 # Ignore level-zero-npu-extensions aka level-zero-vpu-extensions tarballs
 # Is there really no better way to glob a commit hash of exactly 40 hex chars?
 /[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9].tar.gz
+# Ignore the MTL/VPU37xx firmware bin
+/vpu_37xx_v0.0.bin
