@@ -1,7 +1,7 @@
-From 744ca22d5a31b57e9bdfe44223824b88378dac5f Mon Sep 17 00:00:00 2001
+From 3e532e9cb36a28b6a9012324c2562eb686abc635 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 30 Jun 2024 12:48:55 -0400
-Subject: [PATCH 2/3] Disable third-party googletest and yaml-cpp
+Subject: [PATCH 1/2] Disable third-party googletest and yaml-cpp
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
@@ -9,12 +9,12 @@ Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
-index e399700..648350b 100644
+index 378f4b0..e8de55e 100644
 --- a/third_party/CMakeLists.txt
 +++ b/third_party/CMakeLists.txt
-@@ -8,9 +8,9 @@ include(cmake/vpux_elf.cmake)
+@@ -11,9 +11,9 @@ include(cmake/vpux_elf.cmake)
  include(cmake/level-zero.cmake)
- include(cmake/level-zero-vpu-extensions.cmake)
+ include(cmake/level-zero-npu-extensions.cmake)
  
 -set(INSTALL_GTEST OFF)
 -add_subdirectory(googletest EXCLUDE_FROM_ALL)

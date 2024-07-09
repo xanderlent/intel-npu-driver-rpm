@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.5.0
-Release:	5%{?dist}
+Version:	1.5.1
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -11,15 +11,14 @@ URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # TODO: Long-term it would be nice to untangle these vendored dependencies
 %define lz_npu_exts_version e748c51f87fbe8bdcf9dec9e6f14827be4188599
-# v1.5.0 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which does not correspond to any tag or release
+# v1.5.1 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which does not correspond to any tag or release
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
 %define npu_elf_version npu_ud_2024_24_rc1
-# v1.5.0 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which is tagged npu_ud_2024_24_rc1
+# v1.5.1 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which is tagged npu_ud_2024_24_rc1
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/refs/tags/%{npu_elf_version}.tar.gz
 Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
-Patch:		0001-Fix-the-compilation-issues-from-gcc-14.patch
-Patch:		0002-Disable-third-party-googletest-and-yaml-cpp.patch
-Patch:		0003-Always-install-firmware-to-lib-firmware.patch
+Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
+Patch:		0002-Always-install-firmware-to-lib-firmware.patch
 
 # TODO: Can this build on non-x86?
 ExclusiveArch:	i686 x86_64
@@ -30,14 +29,17 @@ BuildRequires:	cmake
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	glibc-devel
+# Upstream is using 1.14.0 as of v1.5.1, but with no meaningful updates to upstream code
 BuildRequires:	gmock-devel >= 1.13.0
 BuildRequires:	gtest-devel >= 1.13.0
 BuildRequires:	libudev-devel
-# TODO: Only rawhide ships 1.17.2 right now, but that's what upstream has tested against
+# Only rawhide ships 1.17.2 right now, but that's what upstream has tested against
+# Upstream is now using 1.17.6 as of v1.5.1, and rawhide is now up to 1.17.7
 #BuildRequires:	oneapi-level-zero-devel >= 1.17.2
 BuildRequires:	oneapi-level-zero-devel >= 1.16.1
 # TODO: maybe higher requirement, but definitely 3.0+
 BuildRequires:	openssl-devel >= 3.0.0
+# Upstream is using 0.8.0 as of v1.5.1, but with no meaningful updates to upstream code
 BuildRequires:	yaml-cpp-devel >= 0.7.0
 # Meteor Lake requires kernel v6.5 or later, Lunar Lake and Arrow Lake require kernel v6.8.12 or later
 # TODO: Requires at runtime? Recommends?
@@ -95,25 +97,22 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 %setup -q -n linux-npu-driver-%{version}
 # Now, stitch the two vendored projects that we need into the source tree
 %setup -q -n linux-npu-driver-%{version} -T -D -a 1
-rmdir third_party/level-zero-vpu-extensions/
-mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-vpu-extensions/
-cp third_party/level-zero-vpu-extensions/LICENSE.txt LICENSE-level-zero-vpu-extensions.txt
+rmdir third_party/level-zero-npu-extensions/
+mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
+cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
 %setup -q -n linux-npu-driver-%{version} -T -D -a 2
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 rm firmware/bin/vpu_37xx_v0.0.bin
 cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
-# Upstream commit ffdc049ca41ad7d8c9555fa95760b7a9f44494a5
-# Should appear in the next release, fixes bugs revealed by gcc 14
-%patch -P 0 -p1
 # Patch out the vendored googletest and yaml-cpp directories
 # (these are git submodules and so are empty in the tarball)
 # TODO: Work with upstream to handle detecting these libraries in CMake
-%patch -P 1 -p1
+%patch -P 0 -p1
 # Patch CMAKE_INSTALL_LIBDIR to lib/ for firmware
 # TODO: Propose this patch to upstream; normally the usage is good but firmware is noarch and so lives with 32-bit code in the 'default' location
-%patch -P 2 -p1
+%patch -P 1 -p1
 
 
 %build
@@ -125,7 +124,7 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 %cmake_install
 
 %files
-%license LICENSE.md third-party-programs.txt LICENSE-level-zero-vpu-extensions.txt LICENSE-vpux_elf
+%license LICENSE.md third-party-programs.txt LICENSE-level-zero-npu-extensions.txt LICENSE-vpux_elf
 # TODO: Also include the RPM repo readme?
 %doc README.md docs/overview.md security.md
 # TODO: Does the unversioned library belong in a -devel package?
@@ -146,6 +145,8 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Tue Jul 9 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.1-1
+- Update to latest upstream release.
 * Thu Jul 4 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-5
 - Revert firmware location change, it seems like a deeper bug
 - Attempt to also own the other directories that we install like /lib/firmware/updates/intel (etc)
