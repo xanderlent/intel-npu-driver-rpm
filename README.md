@@ -14,18 +14,18 @@ Note that this RPM downloads two vendored source code modules for [intel/level-z
 ### Package Availability
 
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/)
-
 This package is available for use with Fedora Linux and possibly other RPM-based distributions through my Fedora Copr repository, [xanderlent/intel-npu-driver](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver). See that page for information on how to install and use this software on Fedora Linux (and possibly other RPM-based distributions).
 
 ### Installation instructions
 
-To use the Intel VPU:
+To use the Intel NPU:
 
   - Enable the Copr.
   - Install the `intel-npu-firmware` package and manually reload the kernel module to pick up the new firmware.
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.
   - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
-  - Still TODO: Other programs that use this driver and/or the headers and libraries that are required to build your own.
+  - Still TODO: The devel parts of this driver; the headers and libraries that are required to build your own code against it.
+
 
 ### Project Homepage and Issue Reporting
 
