@@ -13,7 +13,7 @@ Note that this RPM downloads two vendored source code modules for [intel/level-z
 
 ### Package Availability
 
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/)  
 This package is available for use with Fedora Linux and possibly other RPM-based distributions through my Fedora Copr repository, [xanderlent/intel-npu-driver](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver). See that page for information on how to install and use this software on Fedora Linux (and possibly other RPM-based distributions).
 
 ### Installation instructions
@@ -21,10 +21,13 @@ This package is available for use with Fedora Linux and possibly other RPM-based
 To use the Intel NPU:
 
   - Enable the Copr.
-  - Install the `intel-npu-firmware` package and manually reload the kernel module to pick up the new firmware.
+  - Install the `intel-npu-firmware` package.
+    - If the kernel module has already been loaded, you must manually unload and reload it to pick up the new firmware.
+    - If you want to include the firmware in all of your initramfses, make sure to also run `sudo dracut --regenerate-all --force --install /usr/lib/firmware/updates/intel/vpu/vpu_37xx_v0.0.bin --install /usr/lib/firmware/updates/intel/vpu/vpu_40xx_v0.0.bin`. The install lines are only necessary until the kernel includes the firmware metadata in modinfo, which should happen soon. See [bug #1](https://github.com/xanderlent/intel-npu-driver-rpm/issues/1).
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.
   - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
   - Still TODO: The devel parts of this driver; the headers and libraries that are required to build your own code against it.
+  - Still TODO, possibly in another repo: Programs that acutally use this driver, like Intel's NPU Python library or GIMP Plugin.
 
 
 ### Project Homepage and Issue Reporting
