@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.6.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -142,6 +142,8 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Wed Aug 14 2024 Alexander F. Lent <lx@xanderlent.com> - 1.6.0-2
+- Whoops, sources file has special semantics.
 * Wed Aug 14 2024 Alexander F. Lent <lx@xanderlent.com> - 1.6.0-1
 - Update package to latest upstream release.
 - Bump minimum dependency versions where upstream's preferred version is now in Fedora.
