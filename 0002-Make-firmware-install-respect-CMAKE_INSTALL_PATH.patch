@@ -1,11 +1,11 @@
-From cbac241e6b9323e1fd831fc1d904d235189b2d3a Mon Sep 17 00:00:00 2001
+From fcd4aa9414cf3cf6569aa729971fe4fbe2c9900c Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
-Date: Sun, 30 Jun 2024 14:49:34 -0400
-Subject: [PATCH 2/2] Always install firmware to /lib/firmware
+Date: Wed, 14 Aug 2024 14:49:42 -0400
+Subject: [PATCH 2/2] Make firmware install respect CMAKE_INSTALL_PATH
 
-(The existing solution using the CMAKE_INSTALL_LIBDIR variable gives
-the wrong result on systems like Fedora where noarch files and 32-bit
-libraries live in lib and 64-bit libraries live in lib64.)
+(Upstream tried to fix this by using an absolute path, but then the
+CMake install step will always try to install to /lib rather than
+wherever we are pointing the install.)
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
@@ -13,18 +13,18 @@ Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/firmware/CMakeLists.txt b/firmware/CMakeLists.txt
-index f95e62a..b201813 100644
+index 09bf0aa..b201813 100644
 --- a/firmware/CMakeLists.txt
 +++ b/firmware/CMakeLists.txt
 @@ -12,7 +12,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE include)
  file(GLOB FIRMWARE_BINARIES ${CMAKE_CURRENT_SOURCE_DIR}/bin/*.bin)
  if (FIRMWARE_BINARIES)
    install(FILES ${FIRMWARE_BINARIES}
--    DESTINATION ${CMAKE_INSTALL_LIBDIR}/firmware/updates/intel/vpu/
+-    DESTINATION /lib/firmware/updates/intel/vpu/
 +    DESTINATION lib/firmware/updates/intel/vpu/
      PERMISSIONS OWNER_READ
      COMPONENT fw-npu)
  endif()
 -- 
-2.45.2
+2.46.0
 

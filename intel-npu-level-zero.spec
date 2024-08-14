@@ -1,5 +1,5 @@
 Name:		intel-npu-level-zero
-Version:	1.5.1
+Version:	1.6.0
 Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
@@ -10,33 +10,30 @@ License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # TODO: Long-term it would be nice to untangle these vendored dependencies
-%define lz_npu_exts_version e748c51f87fbe8bdcf9dec9e6f14827be4188599
-# v1.5.1 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which does not correspond to any tag or release
+%define lz_npu_exts_version 518d64125521cd0f8c98d65f9a0fb40013e95d15
+# v1.6.0 vendors commit 518d64125521cd0f8c98d65f9a0fb40013e95d15 which does not correspond to any tag or release in the SCM, sigh.
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
-%define npu_elf_version npu_ud_2024_24_rc1
-# v1.5.1 vendors commit 202d62313d776fa13fa14dea7c7ef7bd671c9e74 which is tagged npu_ud_2024_24_rc1
+%define npu_elf_version npu_ud_2024_32_rc1
+# v1.6.0 vendors commit 43c1c32447328c688e6295142ab74a6ab150d504 which is tagged npu_ud_2024_32_rc1
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/refs/tags/%{npu_elf_version}.tar.gz
 Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
 Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
-Patch:		0002-Always-install-firmware-to-lib-firmware.patch
+Patch:		0002-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
 
 # TODO: Can this build on non-x86?
-ExclusiveArch:	i686 x86_64
+# TODO: Can this even build 32-bit? I haven't tested!
+ExclusiveArch:	x86_64
 
 # NOTE: This project vendors the drm/ivpu_accel.h header and the DMA-BUF headers
 # TODO: Compare vendored headers and switch to using kernel-headers as needed, since the kernel side is upstream.
-BuildRequires:	cmake
+BuildRequires:	cmake >= 3.22
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	glibc-devel
-# Upstream is using 1.14.0 as of v1.5.1, but with no meaningful updates to upstream code
-BuildRequires:	gmock-devel >= 1.13.0
-BuildRequires:	gtest-devel >= 1.13.0
+BuildRequires:	gmock-devel >= 1.14.0
+BuildRequires:	gtest-devel >= 1.14.0
 BuildRequires:	libudev-devel
-# Only rawhide ships 1.17.2 right now, but that's what upstream has tested against
-# Upstream is now using 1.17.6 as of v1.5.1, and rawhide is now up to 1.17.7
-#BuildRequires:	oneapi-level-zero-devel >= 1.17.2
-BuildRequires:	oneapi-level-zero-devel >= 1.16.1
+BuildRequires:	oneapi-level-zero-devel >= 1.17.6
 # TODO: maybe higher requirement, but definitely 3.0+
 BuildRequires:	openssl-devel >= 3.0.0
 # Upstream is using 0.8.0 as of v1.5.1, but with no meaningful updates to upstream code
@@ -145,6 +142,9 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Wed Aug 14 2024 Alexander F. Lent <lx@xanderlent.com> - 1.6.0-1
+- Update package to latest upstream release.
+- Bump minimum dependency versions where upstream's preferred version is now in Fedora.
 * Tue Jul 9 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.1-1
 - Update to latest upstream release.
 * Thu Jul 4 2024 Alexander F. Lent <lx@xanderlent.com> - 1.5.0-5
