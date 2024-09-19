@@ -7,7 +7,7 @@ See the [upstream intel/linux-npu-driver repository](https://github.com/intel/li
 
 ### Sources
 
-The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.6.0 branch](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.6.0).
+The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.8.0 branch](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.8.0).
 
 Note that this RPM downloads two vendored source code modules for [intel/level-zero-npu-extensions](https://github.com/intel/level-zero-npu-extensions/) and [openvinotoolkit/npu\_plugin\_elf](https://github.com/openvinotoolkit/npu_plugin_elf/), and integrates them into the source tree to allow the driver to compile. All other vendored modules are either disabled by us or upstream was thoughtful enough to detect if they are already installed.
 
@@ -28,6 +28,7 @@ To use the Intel NPU:
   - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
   - Still TODO: The devel parts of this driver; the headers and libraries that are required to build your own code against it.
   - Still TODO, possibly in another repo: Programs that acutally use this driver, like Intel's NPU Python library or GIMP Plugin.
+  - Still TODO: The parts of the driver where it can be tightly integrated with OpenVINO.
 
 
 ### Project Homepage and Issue Reporting

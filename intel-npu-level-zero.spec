@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.6.0
-Release:	2%{?dist}
+Version:	1.8.0
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -11,14 +11,17 @@ URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # TODO: Long-term it would be nice to untangle these vendored dependencies
 %define lz_npu_exts_version 518d64125521cd0f8c98d65f9a0fb40013e95d15
-# v1.6.0 vendors commit 518d64125521cd0f8c98d65f9a0fb40013e95d15 which does not correspond to any tag or release in the SCM, sigh.
+# v1.8.0 vendors commit 518d64125521cd0f8c98d65f9a0fb40013e95d15 which does not correspond to any tag or release in the SCM, sigh.
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
 %define npu_elf_version npu_ud_2024_32_rc1
-# v1.6.0 vendors commit 43c1c32447328c688e6295142ab74a6ab150d504 which is tagged npu_ud_2024_32_rc1
+# v1.8.0 vendors commit 43c1c32447328c688e6295142ab74a6ab150d504 which is tagged npu_ud_2024_32_rc1
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/refs/tags/%{npu_elf_version}.tar.gz
 Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
-Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
-Patch:		0002-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
+Patch:		0001-Fix-compiler-warnings-from-gcc-14-and-clang-18.patch
+Patch:		0002-Disable-third-party-googletest-and-yaml-cpp.patch
+Patch:		0003-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
+Patch:		0004-Disable-CMake-s-built-in-packaging.patch
+
 
 # TODO: Can this build on non-x86?
 # TODO: Can this even build 32-bit? I haven't tested!
@@ -97,19 +100,24 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 rmdir third_party/level-zero-npu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
 cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
+cp validation/umd-test/configs/README.md README-umd-test-configs.md
 %setup -q -n linux-npu-driver-%{version} -T -D -a 2
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 rm firmware/bin/vpu_37xx_v0.0.bin
 cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
+# Upstream patch to fix the build with GCC 14 that didn't make the v1.8.0 release
+%patch -P 0 -p1
 # Patch out the vendored googletest and yaml-cpp directories
 # (these are git submodules and so are empty in the tarball)
 # TODO: Work with upstream to handle detecting these libraries in CMake
-%patch -P 0 -p1
+%patch -P 1 -p1
 # Patch CMAKE_INSTALL_LIBDIR to lib/ for firmware
 # TODO: Propose this patch to upstream; normally the usage is good but firmware is noarch and so lives with 32-bit code in the 'default' location
-%patch -P 1 -p1
+%patch -P 2 -p1
+# Patch out the built-in CMake packaging, we don't need it
+%patch -P 3 -p1
 
 
 %build
@@ -123,15 +131,15 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 %files
 %license LICENSE.md third-party-programs.txt LICENSE-level-zero-npu-extensions.txt LICENSE-vpux_elf
 # TODO: Also include the RPM repo readme?
-%doc README.md docs/overview.md security.md
+%doc README.md docs/overview.md security.md README-umd-test-configs.md validation/umd-test/configs/basic.yaml
 # TODO: Does the unversioned library belong in a -devel package?
 %{_libdir}/libze_intel_vpu.so
 %{_libdir}/libze_intel_vpu.so.1
 %{_libdir}/libze_intel_vpu.so.%{version}
 
 %files tests
-%{_bindir}/vpu-kmd-test
-%{_bindir}/vpu-umd-test
+%{_bindir}/npu-kmd-test
+%{_bindir}/npu-umd-test
 
 %files -n intel-npu-firmware
 %license firmware/bin/COPYRIGHT
@@ -142,6 +150,9 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Wed Sep 18 2024 Alexander F. Lent <lx@xanderlent.com> - 1.8.0-1
+- Add some additional documentation files to the package.
+- Update the package to the latest upstream release & patch.
 * Wed Aug 14 2024 Alexander F. Lent <lx@xanderlent.com> - 1.6.0-2
 - Whoops, sources file has special semantics.
 * Wed Aug 14 2024 Alexander F. Lent <lx@xanderlent.com> - 1.6.0-1
