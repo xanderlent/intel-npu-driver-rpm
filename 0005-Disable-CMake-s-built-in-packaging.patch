@@ -1,7 +1,7 @@
-From 20b85dee6daa4c02504a4ea40f5302ddc7f6f823 Mon Sep 17 00:00:00 2001
+From d7f210e85c2e74124210a92628a9578d04eae187 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Wed, 18 Sep 2024 22:48:55 -0400
-Subject: [PATCH 4/4] Disable CMake's built-in packaging
+Subject: [PATCH 5/5] Disable CMake's built-in packaging
 
 It fails on Fedora 40 and we will just use our own RPM spec.
 
@@ -24,5 +24,5 @@ index 850edaa..326dced 100644
  # You may your custom commands in .local.cmake, i.e. driver compilation, running tests.
  include(${CMAKE_CURRENT_SOURCE_DIR}/.local.cmake OPTIONAL)
 -- 
-2.46.0
+2.46.1
 

@@ -1,7 +1,7 @@
-From ac6047988f3a5c084549f2a12dd716445633efe5 Mon Sep 17 00:00:00 2001
+From 0186bfdd7bd62500a5d3f7c4cdee70a6c04044ae Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 30 Jun 2024 12:48:55 -0400
-Subject: [PATCH 2/4] Disable third-party googletest and yaml-cpp
+Subject: [PATCH 3/5] Disable third-party googletest and yaml-cpp
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
@@ -28,5 +28,5 @@ index c732967..11237f3 100644
 +#set(BUILD_SHARED_LIBS OFF)
 +#add_subdirectory(yaml-cpp EXCLUDE_FROM_ALL)
 -- 
-2.46.0
+2.46.1
 

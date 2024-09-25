@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.8.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -18,9 +18,10 @@ Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_ext
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/refs/tags/%{npu_elf_version}.tar.gz
 Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
 Patch:		0001-Fix-compiler-warnings-from-gcc-14-and-clang-18.patch
-Patch:		0002-Disable-third-party-googletest-and-yaml-cpp.patch
-Patch:		0003-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
-Patch:		0004-Disable-CMake-s-built-in-packaging.patch
+Patch:		0002-Fix-incorrect-ENABLE_NPU_COMPILER_BUILD-flag-in-docs.patch
+Patch:		0003-Disable-third-party-googletest-and-yaml-cpp.patch
+Patch:		0004-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
+Patch:		0005-Disable-CMake-s-built-in-packaging.patch
 
 
 # TODO: Can this build on non-x86?
@@ -109,15 +110,17 @@ rm firmware/bin/vpu_37xx_v0.0.bin
 cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 # Upstream patch to fix the build with GCC 14 that didn't make the v1.8.0 release
 %patch -P 0 -p1
+# Upstread patch to fix the documentation on building with OpenVINO (which we don't do yet)
+%patch -P 1 -p1
 # Patch out the vendored googletest and yaml-cpp directories
 # (these are git submodules and so are empty in the tarball)
 # TODO: Work with upstream to handle detecting these libraries in CMake
-%patch -P 1 -p1
+%patch -P 2 -p1
 # Patch CMAKE_INSTALL_LIBDIR to lib/ for firmware
 # TODO: Propose this patch to upstream; normally the usage is good but firmware is noarch and so lives with 32-bit code in the 'default' location
-%patch -P 2 -p1
-# Patch out the built-in CMake packaging, we don't need it
 %patch -P 3 -p1
+# Patch out the built-in CMake packaging, we don't need it
+%patch -P 4 -p1
 
 
 %build
@@ -150,6 +153,9 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Wed Sep 25 2024 Alexander F. Lent <lx@xanderlent.com> - 1.8.0-2
+- Update the package to the latest upstream patch, not yet in any release.
+- It is just a fix to a documented option we aren't using, but still.
 * Wed Sep 18 2024 Alexander F. Lent <lx@xanderlent.com> - 1.8.0-1
 - Add some additional documentation files to the package.
 - Update the package to the latest upstream release & patch.
