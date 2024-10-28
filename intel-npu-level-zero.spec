@@ -67,6 +67,7 @@ Summary:	Intel Neural Processing Unit Firmware
 BuildArch:	noarch
 # NOTE: Keep the description of the firmware in sync with the main package
 # TODO: Do what the upstream package does and auto-reload the NPU kernel module on firmware install?
+# TODO: Trigger regeneration of initramfs since firmware needs to be included there?
 %description -n intel-npu-firmware
 This is the firmware for the Intel NPU device.
 
