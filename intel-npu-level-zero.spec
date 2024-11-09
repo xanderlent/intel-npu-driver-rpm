@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.8.0
-Release:	2%{?dist}
+Version:	1.10.0
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -10,19 +10,15 @@ License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # TODO: Long-term it would be nice to untangle these vendored dependencies
-%define lz_npu_exts_version 518d64125521cd0f8c98d65f9a0fb40013e95d15
-# v1.8.0 vendors commit 518d64125521cd0f8c98d65f9a0fb40013e95d15 which does not correspond to any tag or release in the SCM, sigh.
+%define lz_npu_exts_version a63155ae4e64feaaa6931f4696c2e2e699063875
+# v1.10.0 vendors commit a63155ae4e64feaaa6931f4696c2e2e699063875 which does not correspond to any tag or release in the secondary repo, sigh.
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
-%define npu_elf_version npu_ud_2024_32_rc1
-# v1.8.0 vendors commit 43c1c32447328c688e6295142ab74a6ab150d504 which is tagged npu_ud_2024_32_rc1
-Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/refs/tags/%{npu_elf_version}.tar.gz
+%define npu_elf_version 98f6fc4e93c0aca2c7620a32bd5c684b515f8532
+# v1.10.0 vendors commit 98f6fc4e93c0aca2c7620a32bd5c684b515f8532 which should be tagged npu_ud_2024_44_rc1, but it seems like they forgot to push the tag to the secondary repo, sigh.
+Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
-Patch:		0001-Fix-compiler-warnings-from-gcc-14-and-clang-18.patch
-Patch:		0002-Fix-incorrect-ENABLE_NPU_COMPILER_BUILD-flag-in-docs.patch
-Patch:		0003-Disable-third-party-googletest-and-yaml-cpp.patch
-Patch:		0004-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
-Patch:		0005-Disable-CMake-s-built-in-packaging.patch
-
+Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
+Patch:		0002-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
 
 # TODO: Can this build on non-x86?
 # TODO: Can this even build 32-bit? I haven't tested!
@@ -37,15 +33,17 @@ BuildRequires:	glibc-devel
 BuildRequires:	gmock-devel >= 1.14.0
 BuildRequires:	gtest-devel >= 1.14.0
 BuildRequires:	libudev-devel
-BuildRequires:	oneapi-level-zero-devel >= 1.17.6
+BuildRequires:	oneapi-level-zero-devel >= 1.17.44
 # TODO: maybe higher requirement, but definitely 3.0+
 BuildRequires:	openssl-devel >= 3.0.0
 # Upstream is using 0.8.0 as of v1.5.1, but with no meaningful updates to upstream code
 BuildRequires:	yaml-cpp-devel >= 0.7.0
-# Meteor Lake requires kernel v6.5 or later, Lunar Lake and Arrow Lake require kernel v6.8.12 or later
+# v1.10.0 recommends kernel v6.8.12 or later
 # TODO: Requires at runtime? Recommends?
 #Recommends:	intel-npu-firmware = #{version}
 #Requires:	oneapi-level-zero >= 1.16.1
+# Need to Provides: bundled(level-zero-npu-exts) = some_version
+# Need to Provides: bundled(vpux_elf) = some_version
 
 # Tweaked from the upstream README.md.
 %description
@@ -109,25 +107,17 @@ mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 rm firmware/bin/vpu_37xx_v0.0.bin
 cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
-# Upstream patch to fix the build with GCC 14 that didn't make the v1.8.0 release
-%patch -P 0 -p1
-# Upstread patch to fix the documentation on building with OpenVINO (which we don't do yet)
-%patch -P 1 -p1
 # Patch out the vendored googletest and yaml-cpp directories
 # (these are git submodules and so are empty in the tarball)
 # TODO: Work with upstream to handle detecting these libraries in CMake
-%patch -P 2 -p1
-# Patch CMAKE_INSTALL_LIBDIR to lib/ for firmware
-# TODO: Propose this patch to upstream; normally the usage is good but firmware is noarch and so lives with 32-bit code in the 'default' location
-%patch -P 3 -p1
-# Patch out the built-in CMake packaging, we don't need it
-%patch -P 4 -p1
-
+%patch -P 0 -p1
+# Fix firmware install path to be relative
+# TODO: Propose this patch to upstream
+%patch -P 1 -p1
 
 %build
 %cmake
 %cmake_build
-
 
 %install
 %cmake_install
@@ -154,6 +144,10 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Fri Nov 8 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-1
+- Update package to the latest released version.
+- Allows us to drop a substantial number of patches, including one downstream, yay!
+- Requires us to uprev bundled packages and some dependencies.
 * Wed Sep 25 2024 Alexander F. Lent <lx@xanderlent.com> - 1.8.0-2
 - Update the package to the latest upstream patch, not yet in any release.
 - It is just a fix to a documented option we aren't using, but still.
