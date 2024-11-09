@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.10.0
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -20,10 +20,9 @@ Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/
 Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
 Patch:		0002-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
 # Some extra patches are needed when building against OneAPI Level Zero >= 1.8.4.
-%if 0%{?fedora} >= 41
+# NOTE: These MUST be specified unconditionally or copr won't import them into dist-git.
 Patch:		0001-Remove-structure-and-enum-that-are-introduced-in-ze-.patch
 Patch:		0004-Fix-usage-of-upstreamed-extension.patch
-%endif
 
 # TODO: Can this build on non-x86?
 # TODO: Can this even build 32-bit? I haven't tested!
@@ -164,6 +163,8 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Sat Nov 9 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-3
+- Fix copr import (build should be fine) by unconditionally specifying patchfiles.
 * Fri Nov 8 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-2
 - Whoops, need to patch the extension headers if building against OneAPI Level Zero >= 1.8
 - Apparently they have not tested this since GCC correctly errors out with a type mismatch
