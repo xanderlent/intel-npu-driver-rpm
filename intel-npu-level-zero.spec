@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.10.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -19,6 +19,11 @@ Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_ver
 Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
 Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
 Patch:		0002-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
+# Some extra patches are needed when building against OneAPI Level Zero >= 1.8.4.
+%if 0%{?fedora} >= 41
+Patch:		0001-Remove-structure-and-enum-that-are-introduced-in-ze-.patch
+Patch:		0004-Fix-usage-of-upstreamed-extension.patch
+%endif
 
 # TODO: Can this build on non-x86?
 # TODO: Can this even build 32-bit? I haven't tested!
@@ -33,7 +38,14 @@ BuildRequires:	glibc-devel
 BuildRequires:	gmock-devel >= 1.14.0
 BuildRequires:	gtest-devel >= 1.14.0
 BuildRequires:	libudev-devel
+# NOTE: If building against level zero 1.18 or newer headers, we need to patch the extension headers
+%if 0%{?fedora} >= 41
+# is Fedora 41 or Fedora 42 (rawhide)
+BuildRequires:	oneapi-level-zero-devel >= 1.18.4
+%else
+# is Fedora 40
 BuildRequires:	oneapi-level-zero-devel >= 1.17.44
+%endif
 # TODO: maybe higher requirement, but definitely 3.0+
 BuildRequires:	openssl-devel >= 3.0.0
 # Upstream is using 0.8.0 as of v1.5.1, but with no meaningful updates to upstream code
@@ -99,6 +111,14 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 %setup -q -n linux-npu-driver-%{version} -T -D -a 1
 rmdir third_party/level-zero-npu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
+# When building against OneAPI Level Zero > 1.18.4, patch the extension headers as needed
+%if 0%{?fedora} >= 41
+cd third_party/level-zero-npu-extensions/
+%patch -P 2 -p1
+cd ../..
+# Also patch the driver to work with the changed headers
+%patch -P 3 -p1
+%endif
 cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
 cp validation/umd-test/configs/README.md README-umd-test-configs.md
 %setup -q -n linux-npu-driver-%{version} -T -D -a 2
@@ -144,6 +164,10 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Fri Nov 8 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-2
+- Whoops, need to patch the extension headers if building against OneAPI Level Zero >= 1.8
+- Apparently they have not tested this since GCC correctly errors out with a type mismatch
+  because of the change, so patch the driver to fix the bug.
 * Fri Nov 8 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-1
 - Update package to the latest released version.
 - Allows us to drop a substantial number of patches, including one downstream, yay!
