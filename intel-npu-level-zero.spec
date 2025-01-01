@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.10.0
-Release:	3%{?dist}
+Version:	1.10.1
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -11,18 +11,19 @@ URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # TODO: Long-term it would be nice to untangle these vendored dependencies
 %define lz_npu_exts_version a63155ae4e64feaaa6931f4696c2e2e699063875
-# v1.10.0 vendors commit a63155ae4e64feaaa6931f4696c2e2e699063875 which does not correspond to any tag or release in the secondary repo, sigh.
+# v1.10.1 vendors commit a63155ae4e64feaaa6931f4696c2e2e699063875 which does not correspond to any tag or release in the secondary repo, sigh.
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
 %define npu_elf_version 98f6fc4e93c0aca2c7620a32bd5c684b515f8532
-# v1.10.0 vendors commit 98f6fc4e93c0aca2c7620a32bd5c684b515f8532 which should be tagged npu_ud_2024_44_rc1, but it seems like they forgot to push the tag to the secondary repo, sigh.
+# v1.10.1 vendors commit 98f6fc4e93c0aca2c7620a32bd5c684b515f8532 which should be tagged npu_ud_2024_44_rc1, but it seems like they forgot to push the tag to the secondary repo, sigh.
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
-Source:		https://github.com/intel/linux-npu-driver/raw/v%{version}/firmware/bin/vpu_37xx_v0.0.bin
 Patch:		0001-Disable-third-party-googletest-and-yaml-cpp.patch
 Patch:		0002-Make-firmware-install-respect-CMAKE_INSTALL_PATH.patch
 # Some extra patches are needed when building against OneAPI Level Zero >= 1.8.4.
 # NOTE: These MUST be specified unconditionally or copr won't import them into dist-git.
-Patch:		0001-Remove-structure-and-enum-that-are-introduced-in-ze-.patch
+Patch:		0003-Uprev-level-zero-npu-extensions-to-build-against-hea.patch
 Patch:		0004-Fix-usage-of-upstreamed-extension.patch
+Patch:		0001-Remove-structure-and-enum-that-are-introduced-in-ze-.patch
+
 
 # TODO: Can this build on non-x86?
 # TODO: Can this even build 32-bit? I haven't tested!
@@ -42,7 +43,7 @@ BuildRequires:	libudev-devel
 # is Fedora 41 or Fedora 42 (rawhide)
 BuildRequires:	oneapi-level-zero-devel >= 1.18.4
 %else
-# is Fedora 40
+# is Fedora 40, since we don't support anything lower
 BuildRequires:	oneapi-level-zero-devel >= 1.17.44
 %endif
 # TODO: maybe higher requirement, but definitely 3.0+
@@ -106,16 +107,26 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 
 %prep
 %setup -q -n linux-npu-driver-%{version}
-# Now, stitch the two vendored projects that we need into the source tree
 %setup -q -n linux-npu-driver-%{version} -T -D -a 1
+# Patch out the vendored googletest and yaml-cpp directories
+# (these are git submodules and so are empty in the tarball)
+# TODO: Work with upstream to handle detecting these libraries in CMake
+%patch -P 0 -p1
+# Fix firmware install path to be relative
+# TODO: Propose this patch to upstream
+%patch -P 1 -p1
+# Now, stitch the two vendored projects that we need into the source tree
 rmdir third_party/level-zero-npu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
-# When building against OneAPI Level Zero > 1.18.4, patch the extension headers as needed
+# When building on Fedroa 41+, patch the extension headers and main code
 %if 0%{?fedora} >= 41
 cd third_party/level-zero-npu-extensions/
-%patch -P 2 -p1
+# Note that we never actually apply patch #2! It just uprevs a git submodule in the source tree.
+# It exists only so you can build from the modified source tree on Fedora 41+.
+# This patch (to the extensions repo) uprevs lz_npu_exts_version to 110f48ee8eda22d8b40daeeecdbbed0fc3b08f8b
+%patch -P 4 -p1
 cd ../..
-# Also patch the driver to work with the changed headers
+# Also patch the driver to work with the new headers
 %patch -P 3 -p1
 %endif
 cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
@@ -124,15 +135,6 @@ cp validation/umd-test/configs/README.md README-umd-test-configs.md
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
-rm firmware/bin/vpu_37xx_v0.0.bin
-cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
-# Patch out the vendored googletest and yaml-cpp directories
-# (these are git submodules and so are empty in the tarball)
-# TODO: Work with upstream to handle detecting these libraries in CMake
-%patch -P 0 -p1
-# Fix firmware install path to be relative
-# TODO: Propose this patch to upstream
-%patch -P 1 -p1
 
 %build
 %cmake
@@ -163,6 +165,9 @@ cp %{_sourcedir}/vpu_37xx_v0.0.bin firmware/bin/vpu_37xx_v0.0.bin
 
 
 %changelog
+* Wed Jan 1 2025 Alexander F. Lent <lx@xanderlent.com> - 1.10.1-1
+- Uprev to latest upstream version.
+- Upstream moved firmware file from LFS into repo, so that eliminates some workarounds.
 * Sat Nov 9 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-3
 - Fix copr import (build should be fine) by unconditionally specifying patchfiles.
 * Fri Nov 8 2024 Alexander F. Lent <lx@xanderlent.com> - 1.10.0-2

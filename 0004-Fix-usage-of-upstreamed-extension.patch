@@ -1,4 +1,4 @@
-From 858617e6d81c2268681a41eb539c0a7ee31ff25d Mon Sep 17 00:00:00 2001
+From ff63b69c1abb014653aed9d1791e9f012ff12bc3 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Fri, 8 Nov 2024 23:34:28 -0500
 Subject: [PATCH 4/4] Fix usage of upstreamed extension
@@ -43,5 +43,5 @@ index 4e82b37..25c7978 100644
  
  static bool gatherCommandUpdates(const void *pNext,
 -- 
-2.47.0
+2.45.2
 
