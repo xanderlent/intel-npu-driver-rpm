@@ -22,7 +22,7 @@ To use the Intel NPU:
 
   - Enable the Copr.
   - Install the `intel-npu-firmware` package.
-    - If the kernel module has already been loaded, you must manually unload and reload it to pick up the new firmware. (According to discussions upstream, using an unmatched firmware and driver version is not supported.)
+    - If the kernel module has already been loaded, you must manually unload and reload it to pick up the new firmware. (According to [discussions upstream](https://github.com/intel/linux-npu-driver/issues/17#issuecomment-2278209529), using an unmatched firmware and driver version is not supported.)
     - If you are using Linux v6.12-rc1 or newer, including stable versions v6.6.55, v6.10.14, and v6.11.3 and newer, or your kernel tree includes [upstream commit 58b5618ba80a5e5a8d531a70eae12070e5bd713f (`accel/ivpu: Add missing MODULE_FIRMWARE metadata`)](https://github.com/torvalds/linux/commit/58b5618ba80a5e5a8d531a70eae12070e5bd713f), then dracut should automatically include the ivpu kernel module and associated firmware in your initramfs the next time that it is regenerated. On unpatched kernels, you will need to manually add the firmware to your initramfs.
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.
   - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
