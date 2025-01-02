@@ -1,7 +1,11 @@
 RPM Packages for the Intel Neural Processing Unit Driver for Linux
 ==================================================================
 
-This repository provides packages for the Linux user space driver and proprietary firmware for the Intel Neural Processing Unit (NPU) hardware found on Intel Core Ultra (Series 1) and newer (Meteor Lake and newer) Intel processors. It was formerly known as the Intel Movidius Versatile Processing Unit (VPU). The Linux kernel driver is upstream as `drivers/accel/ivpu`.
+This repository provides packages for the Linux user space driver and proprietary firmware for the Intel AI Boost NPU hardware found on Intel Core Ultra processors.
+
+This driver supports the NPU hardware found in Intel Core Ultra (Series 1) and newer (Meteor Lake and newer) processors from Intel. Currently, the Meteor Lake, Arrow Lake, and Lunar Lake NPUs are supported.
+
+It was formerly known as the Intel (Movidius) Versatile Processing Unit (VPU). The Linux kernel driver is upstream as `drivers/accel/ivpu`.
 
 See the [upstream intel/linux-npu-driver repository](https://github.com/intel/linux-npu-driver) for more information about the hardware, firmware, and software.
 
