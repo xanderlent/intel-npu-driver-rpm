@@ -31,10 +31,10 @@ To use the Intel NPU:
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.
   - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
   - Optionally install the `-debuginfo` and `-debugsource` packages for easier debugging.
+  - Higher level programs that use this driver can be found in the [xanderlent/intel-npu-highlevel copr](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-highlevel/) [(Sources)](https://github.com/xanderlent/intel-npu-highlevel-rpms).
   - Still TODO: The devel parts of this driver; the headers and libraries that are required to build your own code against it.
     - Fedora's `oneapi-level-zero-devel` package provides the common Level Zero headers, but the NPU extension headers are not yet packaged.
-  - Still TODO, possibly in another repo: Programs that acutally use this driver, like Intel's NPU Python library or GIMP Plugin.
-  - Still TODO: This driver can be built with OpenVINO in some kind of tight integration?
+  - Still TODO: This driver can be built with OpenVINO to get the compiler-in-driver component. That's not yet available from this repo.
 
 
 ### Project Homepage and Issue Reporting
