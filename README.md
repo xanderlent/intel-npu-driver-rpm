@@ -18,7 +18,24 @@ Note that this RPM downloads two vendored source code modules for [intel/level-z
 ### Package Availability
 
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver/package/intel-npu-level-zero/)  
-This package is available for use with Fedora Linux and possibly other RPM-based distributions through my Fedora Copr repository, [xanderlent/intel-npu-driver](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver). See that page for information on how to install and use this software on Fedora Linux (and possibly other RPM-based distributions).
+This package is available for use with Fedora Linux and other RPM-based distributions through my Fedora Copr repository, [xanderlent/intel-npu-driver](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-driver). See that page for information on how to install and use this software on Fedora Linux and other RPM-based distributions.
+
+Given that I am maintaining this on a volunteer basis, I can only provide support as I have the time to do so. That said, I will prioritize support for current Fedora stable versions, as the below demonstrates. I will try to announce support decisions in the [discussion thread for the copr](https://discussion.fedoraproject.org/t/xanderlent-intel-npu-driver/124221) as they happen.
+
+#### Support Status for Fedora
+
+- Fedora 39 is not supported, because it has reached end-of-life. (It was initially supported.)
+- Fedora 40 is supported.
+- Fedora 41 is supported.
+- Fedora Rawhide is supported on a best-effort basis, given that breakages frequently occur. It may take some time for me to fix the package.
+
+#### Other Supported Distributions
+
+- EPEL10 is supported on a best-effort basis, since EL10 (CentOS Stream 10) is based on Fedora between 40 and 41.
+  - The only missing dependency was oneapi-level-zero, so I have configured the copr to package that for EPEL10 from the Fedora 40 sources.
+  - Ideally, users will request that the EPEL maintainers begin packaging oneapi-level-zero instead.
+  - I am not proactively testing new releases on EPEL10; I only check that the package builds.
+  - I am happy to troubleshoot issues, but I reserve the right to drop support if it becomes a burden.
 
 ### Installation instructions
 
