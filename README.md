@@ -28,6 +28,7 @@ Given that I am maintaining this on a volunteer basis, I can only provide suppor
 - Fedora 40 is supported.
   - The copr backports oneapi-level-zero from Fedora 41 to Fedora 40, as a newer version is required.
 - Fedora 41 is supported.
+- Fedora 42 is supported.
 - Fedora Rawhide is supported on a best-effort basis, given that breakages frequently occur. It may take some time for me to fix the package.
 
 #### Other Supported Distributions
