@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.13.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -18,10 +18,10 @@ Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_ext
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
-# Fix the build options
-Patch:		0002-Fix-compiler-flags.patch
 # Fix firmware install path to be relative
-Patch:		0003-Make-firmware-respect-CMAKE_INSTALL_PREFIX.patch
+Patch:		0002-Make-firmware-respect-CMAKE_INSTALL_PREFIX.patch
+# Fix the compiler flags
+Patch:		0003-Fix-compiler-flags-for-FORTIFY_SOURCE.patch
 
 
 # TODO: Can this build on non-x86? Can this even build 32-bit? I haven't tested!
@@ -148,6 +148,8 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
+* Sun Mar 9 2025 Alexander F. Lent <lx@xanderlent.com> - 1.13.0-2
+- Tweak patches based on upstream feedback.
 * Fri Jan 31 2025 Alexander F. Lent <lx@xanderlent.com> - 1.13.0-1
 - Uprev to latest upstream version.
 - Require new oneapi-level-zero to build, backports available in copr.

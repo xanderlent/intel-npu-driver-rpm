@@ -1,0 +1,33 @@
+From 13e870a8627155a2783374ae7406f7ff09f215f0 Mon Sep 17 00:00:00 2001
+From: "Wludzik, Jozef" <jozef.wludzik@intel.com>
+Date: Fri, 31 Jan 2025 22:45:01 -0500
+Subject: [PATCH 3/3] Fix compiler flags for FORTIFY_SOURCE
+
+This was suggested by upstream in:
+https://github.com/intel/linux-npu-driver/pull/76
+
+Co-authored-by: Alexander F. Lent <lx@xanderlent.com>
+Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
+---
+ cmake/compiler_flags.cmake | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/cmake/compiler_flags.cmake b/cmake/compiler_flags.cmake
+index 906f70b..ca10cae 100644
+--- a/cmake/compiler_flags.cmake
++++ b/cmake/compiler_flags.cmake
+@@ -28,7 +28,10 @@ add_compile_options(
+ if(NOT ${LINUX_SYSTEM_NAME} STREQUAL "cros_sdk")
+     add_compile_options(
+       # Enable macro security features
+-      -D_FORTIFY_SOURCE=2
++      $<$<CONFIG:Release>:-D_FORTIFY_SOURCE=2>
++      # TODO: Adding O3 in release build help to overcome issue with FORTIFY_SOURCE
++      # issue needs further investigation
++      $<$<CONFIG:Release>:-O3>
+     )
+ endif()
+ 
+-- 
+2.48.1
+
