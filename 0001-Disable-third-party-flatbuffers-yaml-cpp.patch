@@ -1,0 +1,85 @@
+From feb18b0bb2cd2816582075ab9271e8c562623510 Mon Sep 17 00:00:00 2001
+From: "Alexander F. Lent" <lx@xanderlent.com>
+Date: Sun, 9 Mar 2025 13:26:50 -0400
+Subject: [PATCH] Disable third-party flatbuffers/yaml-cpp
+
+Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
+---
+ thirdparty/CMakeLists.txt | 55 ++++++++++++++++++++-------------------
+ 1 file changed, 28 insertions(+), 27 deletions(-)
+
+diff --git a/thirdparty/CMakeLists.txt b/thirdparty/CMakeLists.txt
+index b610f9a9..39d734e6 100644
+--- a/thirdparty/CMakeLists.txt
++++ b/thirdparty/CMakeLists.txt
+@@ -48,30 +48,31 @@ if(CMAKE_SOURCE_DIR STREQUAL OpenVINO_SOURCE_DIR AND
+     # we are building NPU plugin via -DOPENVINO_EXTRA_MODULES
+     # and flatbuffers is already built as part of OpenVINO in case of
+     # building in a single tree
++    # XXX: Why isn't it finding the system flatbuffers? because we aren't enabling the TF lite frontend?
+ else()
+-    set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+-    set(FLATBUFFERS_INSTALL OFF CACHE BOOL "" FORCE)
+-    set(FLATBUFFERS_BUILD_FLATC ON CACHE BOOL "" FORCE)
+-
+-    add_subdirectory(flatbuffers EXCLUDE_FROM_ALL)
+-
+-    # FIXME: this flag is forced while building in a single tree with OV
+-    # but code cannot be compiled with the flag
+-    if(NOT MSVC)
+-        target_compile_options(flatbuffers PRIVATE -Wno-suggest-override)
+-        target_compile_options(flatc PRIVATE -Wno-suggest-override)
+-        if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13))
+-            target_compile_options(flatbuffers PRIVATE -Wno-unused-but-set-variable)
+-            target_compile_options(flatc PRIVATE -Wno-unused-but-set-variable)
+-        endif()
+-    endif()
+-
+-    vpux_add_native_tool(flatc "${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers"
+-        CMAKE_ARGS
+-            "FLATBUFFERS_BUILD_TESTS:BOOL=OFF"
+-            "FLATBUFFERS_INSTALL:BOOL=OFF"
+-            "FLATBUFFERS_BUILD_FLATC:BOOL=ON"
+-    )
++#    set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
++#    set(FLATBUFFERS_INSTALL OFF CACHE BOOL "" FORCE)
++#    set(FLATBUFFERS_BUILD_FLATC ON CACHE BOOL "" FORCE)
++#
++#    add_subdirectory(flatbuffers EXCLUDE_FROM_ALL)
++#
++#    # FIXME: this flag is forced while building in a single tree with OV
++#    # but code cannot be compiled with the flag
++#    if(NOT MSVC)
++#        target_compile_options(flatbuffers PRIVATE -Wno-suggest-override)
++#        target_compile_options(flatc PRIVATE -Wno-suggest-override)
++#        if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13))
++#            target_compile_options(flatbuffers PRIVATE -Wno-unused-but-set-variable)
++#            target_compile_options(flatc PRIVATE -Wno-unused-but-set-variable)
++#        endif()
++#    endif()
++#
++#    vpux_add_native_tool(flatc "${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers"
++#        CMAKE_ARGS
++#            "FLATBUFFERS_BUILD_TESTS:BOOL=OFF"
++#            "FLATBUFFERS_INSTALL:BOOL=OFF"
++#            "FLATBUFFERS_BUILD_FLATC:BOOL=ON"
++#    )
+ endif()
+ 
+ #
+@@ -107,8 +108,8 @@ set(VPUNN_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+ set(VPUNN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+ add_subdirectory(vpucostmodel EXCLUDE_FROM_ALL)
+ 
+-add_subdirectory(yaml-cpp EXCLUDE_FROM_ALL)
++#add_subdirectory(yaml-cpp EXCLUDE_FROM_ALL)
+ # NB: Suppress warnings in yaml-cpp
+-if(NOT MSVC)
+-    target_compile_options(yaml-cpp PRIVATE -Wno-suggest-override)
+-endif()
++#if(NOT MSVC)
++#    target_compile_options(yaml-cpp PRIVATE -Wno-suggest-override)
++#endif()
+-- 
+2.48.1
+
