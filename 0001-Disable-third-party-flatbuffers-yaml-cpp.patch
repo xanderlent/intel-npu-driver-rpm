@@ -1,7 +1,7 @@
 From feb18b0bb2cd2816582075ab9271e8c562623510 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 9 Mar 2025 13:26:50 -0400
-Subject: [PATCH] Disable third-party flatbuffers/yaml-cpp
+Subject: [PATCH 1/2] Disable third-party flatbuffers/yaml-cpp
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---

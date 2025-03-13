@@ -19,12 +19,13 @@ Source2:	https://github.com/intel/npu-nn-cost-model/archive/%{npu_nn_cost_model_
 Source3:	https://github.com/openvinotoolkit/openvino/archive/%{openvino_commit}.tar.gz
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
 Patch0:		0001-Disable-third-party-flatbuffers-yaml-cpp.patch
+Patch1:		0002-Remove-Git-commands-not-useful-in-tarball.patch
 # Patch out a bug in the system level zero detection in OpenVINO
-Patch1:		0001-Fix-detection-of-level-zero-when-ENABLE_SYSTEM_LEVEL.patch
+Patch2:		0001-Fix-detection-of-level-zero-when-ENABLE_SYSTEM_LEVEL.patch
 # Patch out the vendored gflags and patch out bad install-s
-Patch2:		0002-Use-system-gflags-and-disable-spurious-install-s.patch
+Patch3:		0002-Use-system-gflags-and-disable-spurious-install-s.patch
 # Patch out the vendored gtest
-Patch3:		0003-Swap-vendored-gtest-for-official.patch
+Patch4:		0003-Swap-vendored-gtest-for-official.patch
 
 # Common dependencies
 BuildRequires:	cmake
@@ -45,8 +46,8 @@ BuildRequires:	yaml-cpp-devel
 BuildRequires:	mlir-devel < 19.1
 BuildRequires:	llvm-devel < 19.1
 %else
-BuildRequires:	mlir17-devel
-BuildRequires:	llvm17-devel
+BuildRequires:	mlir-devel
+BuildRequires:	llvm18-devel
 %endif
 Provides:	bundled(openvino) = %{openvino_version}
 
@@ -57,6 +58,7 @@ TODO
 %autosetup -N -n npu_compiler-%{version_tag}
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
 %patch -P 0 -p1
+%patch -P 1 -p1
 # Stitch in npu_plugin_elf subtree
 %setup -q -D -T -a 1 -n npu_compiler-%{version_tag}
 rmdir thirdparty/elf
@@ -64,19 +66,19 @@ mv npu_plugin_elf-%{npu_elf_commit}/ thirdparty/elf
 # Note that we do not vendor the NPU LLVM tree, we can use stock LLVM 18,
 # when we turn ON the config option ENABLE_PREBUILT_LLVM_MLIR_LIBS
 # Stitch in npu-nn-cost-model subtree
+# This download includes all of the files stored in Git LFS, thankfully.
 %setup -q -D -T -a 2 -n npu_compiler-%{version_tag}
 rmdir thirdparty/vpucostmodel
 mv npu-nn-cost-model-%{npu_nn_cost_model_commit}/ thirdparty/vpucostmodel
-# TODO: Disable the git lfs commands and manually stitch in LFS files
 # Create OpenVINO subtree as a separate directory from the NPU sources
 # OpenVINO should be the final source so that we build with it
 %setup -q -D -T -b 3 -n openvino-%{openvino_commit}
 # Patch out a bug in the system level zero detection in OpenVINO
-%patch -P 1 -p1
-# Patch out the vendored gflags and patch out bad install-s
 %patch -P 2 -p1
-# Patch out the vendored gtest
+# Patch out the vendored gflags and patch out bad install-s
 %patch -P 3 -p1
+# Patch out the vendored gtest
+%patch -P 4 -p1
 # ONLY on Fedora 40, xbyak-devel doesn't ship with cmake files
 %if 0%{fedora} < 41
 sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dependencies.cmake
