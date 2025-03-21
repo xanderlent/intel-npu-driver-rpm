@@ -38,16 +38,18 @@ BuildRequires:	oneapi-level-zero-devel
 BuildRequires:	gflags-devel
 BuildRequires:	gtest-devel
 BuildRequires:	pkgconfig(pugixml)
+BuildRequires:	pybind11-devel
 # NPU Compiler Dependencies
 BuildRequires:	flatbuffers-compiler
 BuildRequires:	flatbuffers-devel
 BuildRequires:	yaml-cpp-devel
+BuildRequires:	zlib-devel
 %if 0%{fedora} < 41
 BuildRequires:	mlir-devel < 19.1
 BuildRequires:	llvm-devel < 19.1
 %else
 BuildRequires:	mlir-devel
-BuildRequires:	llvm18-devel
+BuildRequires:	llvm-devel
 %endif
 Provides:	bundled(openvino) = %{openvino_version}
 
@@ -59,6 +61,15 @@ TODO
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
 %patch -P 0 -p1
 %patch -P 1 -p1
+# Patch the compiler sources to work under LLVM 19.1+
+%if 0%{?fedora} >= 41
+sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/IE/format.hpp
+sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/optional.hpp
+sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/enums.hpp
+sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/format.hpp
+sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/mask.hpp
+sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_compiler/tblgen/vpux/compiler/dialect/VPUIP/ops_interfaces.td
+%endif
 # Stitch in npu_plugin_elf subtree
 %setup -q -D -T -a 1 -n npu_compiler-%{version_tag}
 rmdir thirdparty/elf
@@ -128,8 +139,7 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 	-DENABLE_TBBBIND_2_5=OFF \
 	-DENABLE_TEMPLATE=OFF \
 	-DENABLE_TESTS=OFF
-# TODO: I think we need to specify the targets to the build step?
-%cmake_build
+%cmake_build --target npu_driver_compiler compilerTest profilingTest vpuxCompilerL0Test loaderTest
 
 %install
 # TODO: I think we need to specify the targets to the install step?
