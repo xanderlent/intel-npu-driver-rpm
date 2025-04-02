@@ -44,38 +44,22 @@ BuildRequires:	flatbuffers-compiler
 BuildRequires:	flatbuffers-devel
 BuildRequires:	yaml-cpp-devel
 BuildRequires:	zlib-devel
-%if 0%{fedora} < 41
-BuildRequires:	mlir-devel < 19.1
-BuildRequires:	llvm-devel < 19.1
-%else
-BuildRequires:	mlir-devel
-BuildRequires:	llvm-devel
-%endif
+
 Provides:	bundled(openvino) = %{openvino_version}
 
 %description
-TODO
+Compiler-in-Driver component of the Intel NPU Driver for Linux
 
 %prep
 %autosetup -N -n npu_compiler-%{version_tag}
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
 %patch -P 0 -p1
 %patch -P 1 -p1
-# Patch the compiler sources to work under LLVM 19.1+
-%if 0%{?fedora} >= 41
-sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/IE/format.hpp
-sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/optional.hpp
-sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/enums.hpp
-sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/format.hpp
-sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_utils/include/vpux/utils/core/mask.hpp
-sed -i "s/llvm::detail/llvm::support::detail/" src/vpux_compiler/tblgen/vpux/compiler/dialect/VPUIP/ops_interfaces.td
-%endif
 # Stitch in npu_plugin_elf subtree
 %setup -q -D -T -a 1 -n npu_compiler-%{version_tag}
 rmdir thirdparty/elf
 mv npu_plugin_elf-%{npu_elf_commit}/ thirdparty/elf
-# Note that we do not vendor the NPU LLVM tree, we can use stock LLVM 18,
-# when we turn ON the config option ENABLE_PREBUILT_LLVM_MLIR_LIBS
+# TODO: We must vendor the LLVM subtree, because it is unfortunately custom.
 # Stitch in npu-nn-cost-model subtree
 # This download includes all of the files stored in Git LFS, thankfully.
 %setup -q -D -T -a 2 -n npu_compiler-%{version_tag}

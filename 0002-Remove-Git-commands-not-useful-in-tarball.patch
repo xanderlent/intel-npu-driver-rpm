@@ -1,4 +1,4 @@
-From 8125b7c002d7ddaeb9b8eb8a381d19d12dd2c7f7 Mon Sep 17 00:00:00 2001
+From 6ef12f94c134869964b64c2b8c51e1a1ed4b73d6 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Thu, 13 Mar 2025 09:24:23 -0400
 Subject: [PATCH 2/2] Remove Git commands (not useful in tarball)
@@ -42,5 +42,5 @@ index 84b7d90a..124381de 100644
  vpux_embed_bin_file(
      SOURCE_FILE "${IE_MAIN_VPUX_PLUGIN_SOURCE_DIR}/thirdparty/vpucostmodel/models/vpu_2_7_159.vpunn"
 -- 
-2.48.1
+2.49.0
 
