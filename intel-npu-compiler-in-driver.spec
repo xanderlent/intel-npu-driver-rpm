@@ -16,7 +16,8 @@ URL:		https://github.com/openvinotoolkit/npu_compiler
 Source0:	%{url}/archive/refs/tags/%{version_tag}.tar.gz
 Source1:	https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_commit}.tar.gz
 Source2:	https://github.com/intel/npu-nn-cost-model/archive/%{npu_nn_cost_model_commit}.tar.gz
-Source3:	https://github.com/openvinotoolkit/openvino/archive/%{openvino_commit}.tar.gz
+Source3:	https://github.com/intel/npu-plugin-llvm/archive/%{npu_llvm_commit}.tar.gz
+Source4:	https://github.com/openvinotoolkit/openvino/archive/%{openvino_commit}.tar.gz
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
 Patch0:		0001-Disable-third-party-flatbuffers-yaml-cpp.patch
 Patch1:		0002-Remove-Git-commands-not-useful-in-tarball.patch
@@ -59,15 +60,18 @@ Compiler-in-Driver component of the Intel NPU Driver for Linux
 %setup -q -D -T -a 1 -n npu_compiler-%{version_tag}
 rmdir thirdparty/elf
 mv npu_plugin_elf-%{npu_elf_commit}/ thirdparty/elf
-# TODO: We must vendor the LLVM subtree, because it is unfortunately custom.
 # Stitch in npu-nn-cost-model subtree
 # This download includes all of the files stored in Git LFS, thankfully.
 %setup -q -D -T -a 2 -n npu_compiler-%{version_tag}
 rmdir thirdparty/vpucostmodel
 mv npu-nn-cost-model-%{npu_nn_cost_model_commit}/ thirdparty/vpucostmodel
+# Stitch in the custom LLVM subtree
+%setup -q -D -T -a 3 -n npu_compiler-%{version_tag}
+rmdir thirdparty/llvm-project
+mv npu-plugin-llvm-%{npu_llvm_commit}/ thirdparty/llvm-project
 # Create OpenVINO subtree as a separate directory from the NPU sources
 # OpenVINO should be the final source so that we build with it
-%setup -q -D -T -b 3 -n openvino-%{openvino_commit}
+%setup -q -D -T -b 4 -n openvino-%{openvino_commit}
 # Patch out a bug in the system level zero detection in OpenVINO
 %patch -P 2 -p1
 # Patch out the vendored gflags and patch out bad install-s
@@ -88,7 +92,7 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 	-DCMAKE_C_COMPILER=gcc \
 	-DCMAKE_CXX_COMPILER=g++ \
 	-DBUILD_COMPILER_FOR_DRIVER=ON \
-	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=ON \
+	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=OFF \
 	-DOPENVINO_EXTRA_MODULES=../npu_compiler-npu_ud_2025_04_rc2 \
 	-DTHREADING="TBB" \
 	-DENABLE_SYSTEM_TBB=ON \
@@ -123,6 +127,7 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 	-DENABLE_TBBBIND_2_5=OFF \
 	-DENABLE_TEMPLATE=OFF \
 	-DENABLE_TESTS=OFF
+# We never get to the build?
 %cmake_build --target npu_driver_compiler compilerTest profilingTest vpuxCompilerL0Test loaderTest
 
 %install
