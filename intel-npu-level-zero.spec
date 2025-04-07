@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.13.0
-Release:	2%{?dist}
+Version:	1.16.0
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -11,17 +11,15 @@ License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # this version vendors the below commit which does not correspond to any tag or release in the secondary repo
-%define lz_npu_exts_version 110f48ee8eda22d8b40daeeecdbbed0fc3b08f8b
+%define lz_npu_exts_version c0156a3390ae39671ff8f2a6f5471f04bb65bb12
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
 # this version vendors the below commit which should be tagged except Intel forgot to push them for recent releases
-%define npu_elf_version 2184e3a0c768e970916435405cd0a80809823673
+%define npu_elf_version ce501d3059c81fd6bd0ad7165ab823838fa5d851
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
 # Fix firmware install path to be relative
 Patch:		0002-Make-firmware-respect-CMAKE_INSTALL_PREFIX.patch
-# Fix the compiler flags
-Patch:		0003-Fix-compiler-flags-for-FORTIFY_SOURCE.patch
 
 
 # TODO: Can this build on non-x86? Can this even build 32-bit? I haven't tested!
@@ -33,16 +31,11 @@ BuildRequires:	gcc-c++
 BuildRequires:	glibc-devel
 BuildRequires:	gmock-devel >= 1.14.0
 BuildRequires:	gtest-devel >= 1.14.0
-BuildRequires:	libudev-devel
 BuildRequires:	oneapi-level-zero-devel >= 1.18.4
-# TODO: maybe higher requirement, but definitely 3.0+
-BuildRequires:	openssl-devel >= 3.0.0
 # Upstream is using 0.8.0 as of v1.5.1, but with no meaningful updates to upstream code
 BuildRequires:	yaml-cpp-devel >= 0.7.0
-Provides: bundled(level-zero-npu-exts-devel)
+Provides: bundled(level-zero-npu-extensions)
 Provides: bundled(openvino-npu_plugin_elf)
-# TODO: Recommends/Suggests for any of these packages?
-#Recommends:	intel-npu-firmware = #{version}
 
 # Tweaked from the upstream README.md.
 %description
@@ -58,14 +51,15 @@ Note that while this device is officially called the Neural Processing Unit,
 the Linux kernel driver uses the previous name of Versatile Processing Unit
 (VPU).
 
-%package -n intel-npu-firmware
+%package -n intel-npu-firmware-upstream
 License:	Redistributable, no modification permitted
 Summary:	Intel Neural Processing Unit Firmware
 BuildArch:	noarch
+Obsoletes:	intel-npu-firmware <= 1.13.0
 # NOTE: Keep the description of the firmware in sync with the main package
 # TODO: Do what the upstream package does and auto-reload the NPU kernel module on firmware install?
 # TODO: Trigger regeneration of initramfs since firmware needs to be included there?
-%description -n intel-npu-firmware
+%description -n intel-npu-firmware-upstream
 This is the firmware for the Intel NPU device.
 
 The Intel NPU device is an AI inference accelerator integrated with Intel
@@ -117,6 +111,9 @@ cp validation/umd-test/configs/README.md README-umd-test-configs.md
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
+# Make extension headers reference system headers
+# for some reason this worked without changes prior to v1.16.0
+sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/level-zero-npu-extensions/ze_graph_ext.h
 
 %build
 %cmake -DUSE_SYSTEM_LIBRARIES=ON
@@ -129,17 +126,17 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 %license LICENSE.md third-party-programs.txt LICENSE-level-zero-npu-extensions.txt LICENSE-vpux_elf
 # TODO: Also include the RPM repo readme?
 %doc README.md docs/overview.md security.md README-umd-test-configs.md validation/umd-test/configs/basic.yaml
-%{_libdir}/libze_intel_vpu.so.1
-%{_libdir}/libze_intel_vpu.so.%{version}
+%{_libdir}/libze_intel_npu.so.1
+%{_libdir}/libze_intel_npu.so.%{version}
 
 %files devel
-%{_libdir}/libze_intel_vpu.so
+%{_libdir}/libze_intel_npu.so
 
 %files tests
 %{_bindir}/npu-kmd-test
 %{_bindir}/npu-umd-test
 
-%files -n intel-npu-firmware
+%files -n intel-npu-firmware-upstream
 %license firmware/bin/COPYRIGHT
 /usr/lib/firmware/updates/intel
 
@@ -148,6 +145,9 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
+* Mon Apr 7 2025 Alexander F. Lent <lx@xanderlent.com> - 1.16.0-1
+- Upgrade to latest version
+- Rename the intel-npu-firmware package to intel-npu-firmware-upstream
 * Sun Mar 9 2025 Alexander F. Lent <lx@xanderlent.com> - 1.13.0-2
 - Tweak patches based on upstream feedback.
 * Fri Jan 31 2025 Alexander F. Lent <lx@xanderlent.com> - 1.13.0-1

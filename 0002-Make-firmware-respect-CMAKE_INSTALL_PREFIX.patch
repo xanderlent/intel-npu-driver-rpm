@@ -1,4 +1,4 @@
-From 7350db5bf712149cb9a9a485a8a43a9264536c32 Mon Sep 17 00:00:00 2001
+From 607ec0fadf85e80631d87e21d5a09624bde13094 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Wed, 14 Aug 2024 14:49:42 -0400
 Subject: [PATCH 2/3] Make firmware respect CMAKE_INSTALL_PREFIX
@@ -27,5 +27,5 @@ index 09bf0aa..b201813 100644
      COMPONENT fw-npu)
  endif()
 -- 
-2.48.1
+2.49.0
 
