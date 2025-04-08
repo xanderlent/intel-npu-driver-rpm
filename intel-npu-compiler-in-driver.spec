@@ -1,14 +1,14 @@
 Name:		intel-npu-compiler-in-driver
-Version:	UD2025.04
+Version:	UD2025.12
 Release:	1%{?dist}
 Summary:	Intel NPU Compiler-In-Driver component
 
-%define version_tag npu_ud_2025_04_rc2
+%define version_tag npu_ud_2025_12_rc2
 %define npu_llvm_commit 0d1145010d6d2ba48a945c824ed0ca03254b94ed
-%define npu_elf_commit 2184e3a0c768e970916435405cd0a80809823673
-%define npu_nn_cost_model_commit 483447ff4de0f1818fe3794a716b356400c7b369
-%define openvino_commit 99d7cd4bc4492b81a99bc41e2d2469da1a929491
-%define openvino_version 2024.6.0^20241204git99d7cd4
+%define npu_elf_commit ce501d3059c81fd6bd0ad7165ab823838fa5d851
+%define npu_nn_cost_model_commit a965531d3d3a37748cc5ab7feac342b35baaf7b4
+%define openvino_commit 8d5f583bc7e56152440192806b3acda619a997fe
+%define openvino_version 2025.0.0^20250121git8d5f583
 
 # TODO: Thoroughly audit included licenses!
 License:	Apache-2.0
@@ -18,15 +18,20 @@ Source1:	https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_com
 Source2:	https://github.com/intel/npu-nn-cost-model/archive/%{npu_nn_cost_model_commit}.tar.gz
 Source3:	https://github.com/intel/npu-plugin-llvm/archive/%{npu_llvm_commit}.tar.gz
 Source4:	https://github.com/openvinotoolkit/openvino/archive/%{openvino_commit}.tar.gz
+# npu_compiler Patches
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
 Patch0:		0001-Disable-third-party-flatbuffers-yaml-cpp.patch
+# Don't run git commands when working with the cost model, since we use the tarball
+# (which thankfully includes all of the LFS artifacts)
 Patch1:		0002-Remove-Git-commands-not-useful-in-tarball.patch
-# Patch out a bug in the system level zero detection in OpenVINO
-Patch2:		0001-Fix-detection-of-level-zero-when-ENABLE_SYSTEM_LEVEL.patch
+# Upstream patch to help with building on Fedora:
+# https://github.com/intel/linux-npu-driver/pull/76
+Patch2:		0001-Disable-compiler-warning-as-error-in-npu_compiler.patch
+# OpenVINO Patches
 # Patch out the vendored gflags and patch out bad install-s
-Patch3:		0002-Use-system-gflags-and-disable-spurious-install-s.patch
+Patch3:		0001-Use-system-gflags-and-disable-spurious-install-s.patch
 # Patch out the vendored gtest
-Patch4:		0003-Swap-vendored-gtest-for-official.patch
+Patch4:		0002-Swap-vendored-gtest-for-official.patch
 
 # Common dependencies
 BuildRequires:	cmake
@@ -53,7 +58,7 @@ Compiler-in-Driver component of the Intel NPU Driver for Linux
 
 %prep
 %autosetup -N -n npu_compiler-%{version_tag}
-# Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
+# Apply npu_compiler Patches
 %patch -P 0 -p1
 %patch -P 1 -p1
 # Stitch in npu_plugin_elf subtree
@@ -72,11 +77,8 @@ mv npu-plugin-llvm-%{npu_llvm_commit}/ thirdparty/llvm-project
 # Create OpenVINO subtree as a separate directory from the NPU sources
 # OpenVINO should be the final source so that we build with it
 %setup -q -D -T -b 4 -n openvino-%{openvino_commit}
-# Patch out a bug in the system level zero detection in OpenVINO
-%patch -P 2 -p1
-# Patch out the vendored gflags and patch out bad install-s
+# Apply OpenVINO patches
 %patch -P 3 -p1
-# Patch out the vendored gtest
 %patch -P 4 -p1
 # ONLY on Fedora 40, xbyak-devel doesn't ship with cmake files
 %if 0%{fedora} < 41
@@ -89,11 +91,9 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 # https://github.com/openvinotoolkit/npu_compiler/blob/develop/src/vpux_driver_compiler/docs/how_to_build_driver_compiler_on_linux.md
 # Note that the CMake command to build the npu_compiler must come from the OpenVINO sources.
 %cmake \
-	-DCMAKE_C_COMPILER=gcc \
-	-DCMAKE_CXX_COMPILER=g++ \
 	-DBUILD_COMPILER_FOR_DRIVER=ON \
 	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=OFF \
-	-DOPENVINO_EXTRA_MODULES=../npu_compiler-npu_ud_2025_04_rc2 \
+	-DOPENVINO_EXTRA_MODULES=../npu_compiler-%{version_tag} \
 	-DTHREADING="TBB" \
 	-DENABLE_SYSTEM_TBB=ON \
 	-DENABLE_SYSTEM_PUGIXML=ON \
@@ -127,7 +127,6 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 	-DENABLE_TBBBIND_2_5=OFF \
 	-DENABLE_TEMPLATE=OFF \
 	-DENABLE_TESTS=OFF
-# We never get to the build?
 %cmake_build --target npu_driver_compiler compilerTest profilingTest vpuxCompilerL0Test loaderTest
 
 %install

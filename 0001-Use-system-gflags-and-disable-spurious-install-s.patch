@@ -1,7 +1,7 @@
-From bce54e28e6102f32defb0d5603b28a556e21bfd3 Mon Sep 17 00:00:00 2001
+From 71264a876c83874ff7b8b951d583f6e6ab5e4436 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Thu, 13 Mar 2025 00:07:55 -0400
-Subject: [PATCH 2/3] Use system gflags and disable spurious install-s
+Subject: [PATCH 1/2] Use system gflags and disable spurious install-s
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
  1 file changed, 47 insertions(+), 47 deletions(-)
 
 diff --git a/thirdparty/dependencies.cmake b/thirdparty/dependencies.cmake
-index 51c9c63c97..ba571db1c9 100644
+index 6a2ae682d6..b3beae9195 100644
 --- a/thirdparty/dependencies.cmake
 +++ b/thirdparty/dependencies.cmake
 @@ -297,8 +297,8 @@ endif()
@@ -23,7 +23,7 @@ index 51c9c63c97..ba571db1c9 100644
  endif()
  
  #
-@@ -561,51 +561,51 @@ endif()
+@@ -560,51 +560,51 @@ endif()
  # Install
  #
  
@@ -121,5 +121,5 @@ index 51c9c63c97..ba571db1c9 100644
  # restore state
  
 -- 
-2.48.1
+2.49.0
 

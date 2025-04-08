@@ -1,7 +1,7 @@
-From fa74be0bcfbb989984748060840f1a93df51a12a Mon Sep 17 00:00:00 2001
+From f43f5adc027424de623160e203a04c21c569e7d0 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Thu, 13 Mar 2025 00:15:03 -0400
-Subject: [PATCH 3/3] Swap vendored gtest for official
+Subject: [PATCH 2/2] Swap vendored gtest for official
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
  2 files changed, 60 insertions(+), 59 deletions(-)
 
 diff --git a/thirdparty/dependencies.cmake b/thirdparty/dependencies.cmake
-index ba571db1c9..7db9bd9324 100644
+index b3beae9195..b3974201d5 100644
 --- a/thirdparty/dependencies.cmake
 +++ b/thirdparty/dependencies.cmake
 @@ -307,7 +307,7 @@ endif()
@@ -49,7 +49,7 @@ index ba571db1c9..7db9bd9324 100644
  endif()
  
 diff --git a/thirdparty/gtest/CMakeLists.txt b/thirdparty/gtest/CMakeLists.txt
-index 081f17f7eb..445effd891 100644
+index c2dac29f2b..4c7c5f29bf 100644
 --- a/thirdparty/gtest/CMakeLists.txt
 +++ b/thirdparty/gtest/CMakeLists.txt
 @@ -6,52 +6,52 @@
@@ -155,5 +155,5 @@ index 081f17f7eb..445effd891 100644
 +#    set_target_properties(${target} PROPERTIES FOLDER thirdparty)
 +#endforeach()
 -- 
-2.48.1
+2.49.0
 
