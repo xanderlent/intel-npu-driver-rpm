@@ -34,8 +34,6 @@ Given that I am maintaining this on a volunteer basis, I can only provide suppor
 #### Other Supported Distributions
 
 - EPEL10 is supported on a best-effort basis, since EL10 (CentOS Stream 10) is based on Fedora between 40 and 41.
-  - EPEL10 is missing oneapi-level-zero; since we're already backporting it for Fedora 40, do the same for EPEL10.
-  - Ideally, users will request that the EPEL maintainers begin packaging oneapi-level-zero instead.
   - I am not proactively testing new releases on EPEL10; I only check that the package builds.
   - I am happy to troubleshoot issues, but I reserve the right to drop support if it becomes a burden.
 
@@ -49,7 +47,7 @@ To use the Intel NPU:
     - If the kernel module has already been loaded, you must manually unload and reload it to pick up the new firmware.
     - If you are using a recent kernel dracut should automatically include the ivpu kernel module and associated firmware in your initramfs the next time that it is regenerated (usually when you get a new kernel version). Triggering this on firmware install is TODO.
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.
-    - Users of Fedora 40 and EPEL 10 need to install oneapi-level-zero from this copr as well, since it backports the latest version from Fedora 41, which is required by the upstream driver as of 1.13.0 and newer.
+    - Users of Fedora 40 need to install oneapi-level-zero from this copr as well, since it backports the latest version from Fedora 41, which is required by the upstream driver as of 1.13.0 and newer.
   - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
   - Optionally install the `-debuginfo` and `-debugsource` packages for easier debugging.
   - Higher level programs that use this driver can be found in the [xanderlent/intel-npu-highlevel copr](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-highlevel/) [(Sources)](https://github.com/xanderlent/intel-npu-highlevel-rpms).
