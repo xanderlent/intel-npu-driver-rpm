@@ -16,7 +16,7 @@ URL:		https://github.com/openvinotoolkit/npu_compiler
 Source0:	%{url}/archive/refs/tags/%{version_tag}.tar.gz
 Source1:	https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_commit}.tar.gz
 Source2:	https://github.com/intel/npu-nn-cost-model/archive/%{npu_nn_cost_model_commit}.tar.gz
-Source3:	https://github.com/intel/npu-plugin-llvm/archive/%{npu_llvm_commit}.tar.gz
+#Source3:	https://github.com/intel/npu-plugin-llvm/archive/%{npu_llvm_commit}.tar.gz
 Source4:	https://github.com/openvinotoolkit/openvino/archive/%{openvino_commit}.tar.gz
 # npu_compiler Patches
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
@@ -32,6 +32,8 @@ Patch2:		0001-Disable-compiler-warning-as-error-in-npu_compiler.patch
 Patch3:		0001-Use-system-gflags-and-disable-spurious-install-s.patch
 # Patch out the vendored gtest
 Patch4:		0002-Swap-vendored-gtest-for-official.patch
+
+%global toolchain clang
 
 # Common dependencies
 BuildRequires:	cmake
@@ -71,9 +73,9 @@ mv npu_plugin_elf-%{npu_elf_commit}/ thirdparty/elf
 rmdir thirdparty/vpucostmodel
 mv npu-nn-cost-model-%{npu_nn_cost_model_commit}/ thirdparty/vpucostmodel
 # Stitch in the custom LLVM subtree
-%setup -q -D -T -a 3 -n npu_compiler-%{version_tag}
-rmdir thirdparty/llvm-project
-mv npu-plugin-llvm-%{npu_llvm_commit}/ thirdparty/llvm-project
+#setup -q -D -T -a 3 -n npu_compiler-%{version_tag}
+#rmdir thirdparty/llvm-project
+#mv npu-plugin-llvm-%{npu_llvm_commit}/ thirdparty/llvm-project
 # Create OpenVINO subtree as a separate directory from the NPU sources
 # OpenVINO should be the final source so that we build with it
 %setup -q -D -T -b 4 -n openvino-%{openvino_commit}
@@ -92,9 +94,10 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 # Note that the CMake command to build the npu_compiler must come from the OpenVINO sources.
 %cmake \
 	-DBUILD_COMPILER_FOR_DRIVER=ON \
-	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=OFF \
+	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=ON \
 	-DOPENVINO_EXTRA_MODULES=../npu_compiler-%{version_tag} \
 	-DTHREADING="TBB" \
+	-DENABLE_INTEL_NPU=ON \
 	-DENABLE_SYSTEM_TBB=ON \
 	-DENABLE_SYSTEM_PUGIXML=ON \
 	-DENABLE_SYSTEM_FLATBUFFERS=ON \
@@ -127,7 +130,7 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 	-DENABLE_TBBBIND_2_5=OFF \
 	-DENABLE_TEMPLATE=OFF \
 	-DENABLE_TESTS=OFF
-%cmake_build --target npu_driver_compiler compilerTest profilingTest vpuxCompilerL0Test loaderTest
+%cmake_build -j1 --target npu_driver_compiler compilerTest profilingTest vpuxCompilerL0Test loaderTest
 
 %install
 # TODO: I think we need to specify the targets to the install step?
