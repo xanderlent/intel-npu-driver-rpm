@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.16.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -18,8 +18,6 @@ Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_ext
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
-# Fix firmware install path to be relative
-Patch:		0002-Make-firmware-respect-CMAKE_INSTALL_PREFIX.patch
 
 
 # TODO: Can this build on non-x86? Can this even build 32-bit? I haven't tested!
@@ -138,7 +136,7 @@ sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/le
 
 %files -n intel-npu-firmware-upstream
 %license firmware/bin/COPYRIGHT
-/usr/lib/firmware/updates/intel
+/lib/firmware/updates/intel
 
 %check
 %ctest
