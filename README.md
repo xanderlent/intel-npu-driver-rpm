@@ -1,5 +1,5 @@
-RPM Packages for the Intel Neural Processing Unit Driver for Linux
-==================================================================
+Intel AI Boost NPU Driver for Linux
+===================================
 
 This repository provides packages for the Linux user space driver and proprietary firmware for the Intel AI Boost NPU hardware found on Intel Core Ultra processors.
 
