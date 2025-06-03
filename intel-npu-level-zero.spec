@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.16.0
-Release:	2%{?dist}
+Version:	1.17.0
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -11,10 +11,10 @@ License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # this version vendors the below commit which does not correspond to any tag or release in the secondary repo
-%define lz_npu_exts_version c0156a3390ae39671ff8f2a6f5471f04bb65bb12
+%define lz_npu_exts_version c7d8f849d6a8195c1db38cbaca8d431cbabf3a6e
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
 # this version vendors the below commit which should be tagged except Intel forgot to push them for recent releases
-%define npu_elf_version ce501d3059c81fd6bd0ad7165ab823838fa5d851
+%define npu_elf_version 50f2b13dbb6dd435c3e2ef6f8abb7393633bfcdd
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
@@ -70,12 +70,12 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 (VPU).
 
 
-%package tests
+%package validation
 License:	MIT AND Apache-2.0
 Summary:	Tests for the Intel Neural Processing Unit Driver for Linux
 # TODO: Do the tests actually require any of the other parts? Or any deps?
-%description tests
-Tests for the Intel NPU Driver for Linux.
+%description validation
+Validation programs & tests for the Intel NPU Driver for Linux.
 
 These programs exercise the kernel-mode (kmd) and user-mode (umd) parts of
 the driver.
@@ -111,7 +111,7 @@ mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 # Make extension headers reference system headers
 # for some reason this worked without changes prior to v1.16.0
-sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/level-zero-npu-extensions/ze_graph_ext.h
+#sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/level-zero-npu-extensions/ze_graph_ext.h
 
 %build
 %cmake -DUSE_SYSTEM_LIBRARIES=ON
@@ -130,7 +130,7 @@ sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/le
 %files devel
 %{_libdir}/libze_intel_npu.so
 
-%files tests
+%files validation
 %{_bindir}/npu-kmd-test
 %{_bindir}/npu-umd-test
 
@@ -139,10 +139,16 @@ sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/le
 /lib/firmware/updates/intel
 
 %check
+# I think this is currently a no-op.
 %ctest
 
 
 %changelog
+* Mon Jun 2 2025 Alexander F. Lent <lx@xanderlent.com> - 1.17.0-1
+- Upgrade to latest version
+- Rename the -tests package to -validation to be a little closer to upstream.
+* Sat Apr 12 2025 Alexander F. Lent <lx@xanderlent.com> - 1.16.0-2
+- Drop the patch to the firmware path.
 * Mon Apr 7 2025 Alexander F. Lent <lx@xanderlent.com> - 1.16.0-1
 - Upgrade to latest version
 - Rename the intel-npu-firmware package to intel-npu-firmware-upstream

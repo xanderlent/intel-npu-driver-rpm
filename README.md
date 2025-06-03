@@ -11,7 +11,7 @@ See the [upstream intel/linux-npu-driver repository](https://github.com/intel/li
 
 ### Sources
 
-The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.16.0-2 tag](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.16.0-2).
+The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.17.0-1 tag](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.17.0-1).
 
 Note that this RPM downloads two vendored source code modules for [intel/level-zero-npu-extensions](https://github.com/intel/level-zero-npu-extensions/) and [openvinotoolkit/npu\_plugin\_elf](https://github.com/openvinotoolkit/npu_plugin_elf/), and integrates them into the source tree to allow the driver to compile. All other vendored modules are either disabled by us or upstream was thoughtful enough to detect if they are already installed.
 
@@ -25,17 +25,18 @@ Given that I am maintaining this on a volunteer basis, I can only provide suppor
 #### Support Status for Fedora
 
 - Fedora 39 is not supported, because it has reached end-of-life. (It was initially supported.)
-- Fedora 40 is supported.
-  - The copr backports oneapi-level-zero from Fedora 41 to Fedora 40, as a newer version is required.
+- Fedora 40 is not supported, because it has reached end-of-life. (It was supported through v1.16.0-2.)
 - Fedora 41 is supported.
 - Fedora 42 is supported.
-- Fedora Rawhide is supported on a best-effort basis, given that breakages frequently occur. It may take some time for me to fix the package.
+- Fedora Rawhide is supported with the caveat that changes in Rawhide may sometimes break the build for a time.
+  - Unlike packages I officially maintain for Fedora, I cannot promise prompt fixes to rawhide for this third-party package.
 
 #### Other Supported Distributions
 
 - EPEL10 is supported on a best-effort basis, since EL10 (CentOS Stream 10) is based on Fedora between 40 and 41.
   - I am not proactively testing new releases on EPEL10; I only check that the package builds.
   - I am happy to troubleshoot issues, but I reserve the right to drop support if it becomes a burden.
+  - For now, EPEL10 backports a sufficiently new version of oneapi-level-zero.
 
 ### Installation instructions
 
@@ -47,8 +48,7 @@ To use the Intel NPU:
     - If the kernel module has already been loaded, you must manually unload and reload it to pick up the new firmware.
     - If you are using a recent kernel dracut should automatically include the ivpu kernel module and associated firmware in your initramfs the next time that it is regenerated (usually when you get a new kernel version). Triggering this on firmware install is TODO.
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.
-    - Users of Fedora 40 need to install oneapi-level-zero from this copr as well, since it backports the latest version from Fedora 41, which is required by the upstream driver as of 1.13.0 and newer.
-  - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-tests`.
+  - Optionally install and run the user-mode and kernel-mode driver tests from `intel-npu-level-zero-validation`.
   - Optionally install the `-debuginfo` and `-debugsource` packages for easier debugging.
   - Higher level programs that use this driver can be found in the [xanderlent/intel-npu-highlevel copr](https://copr.fedorainfracloud.org/coprs/xanderlent/intel-npu-highlevel/) [(Sources)](https://github.com/xanderlent/intel-npu-highlevel-rpms).
   - The -devel package, which contains the unversioned .so file.

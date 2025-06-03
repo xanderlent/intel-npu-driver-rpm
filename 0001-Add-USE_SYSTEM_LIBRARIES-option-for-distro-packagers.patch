@@ -1,30 +1,35 @@
-From 358c518d1a99315371acf91e222663875dfbfea8 Mon Sep 17 00:00:00 2001
+From 8c723424f10a1e7ae7a761202bf1b1ac8c2fce1b Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Fri, 31 Jan 2025 22:42:26 -0500
-Subject: [PATCH 1/3] Add USE_SYSTEM_LIBRARIES option for distro packagers
+Subject: [PATCH] Add USE_SYSTEM_LIBRARIES option for distro packagers
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
- CMakeLists.txt                                 |  2 ++
+ CMakeLists.txt                                 |  3 +++
  third_party/CMakeLists.txt                     | 18 +++++++++++++-----
  .../cmake/level-zero-npu-extensions.cmake      |  5 +++++
  third_party/cmake/level-zero.cmake             |  3 +++
  third_party/cmake/vpux_elf.cmake               |  5 +++++
- 5 files changed, 28 insertions(+), 5 deletions(-)
+ 5 files changed, 29 insertions(+), 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 763d027..0b7569f 100644
+index ded4698..f318299 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -37,6 +37,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
- option(ENABLE_OPENVINO_PACKAGE "Enable building the OpenVINO + NPU Plugin package" OFF)
+@@ -37,10 +37,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ option(ENABLE_OPENVINO_PACKAGE "Enable building the OpenVINO package" OFF)
  option(ENABLE_NPU_COMPILER_BUILD "Enable building compiler in driver" OFF)
  option(ENABLE_NPU_PERFETTO_BUILD "Enable building with Perfetto library" OFF)
 +# TODO: USE_SYSTEM_LIBRARIES should also unvendor the kernel uapi header.
 +option(USE_SYSTEM_LIBRARIES "Use system versions of third_party libraries" OFF)
  
- message(STATUS "option ENABLE_OPENVINO_PACKAGE: ${ENABLE_OPENVINO_PACKAGE}")
  message(STATUS "option ENABLE_NPU_COMPILER_BUILD: ${ENABLE_NPU_COMPILER_BUILD}")
+ message(STATUS "option ENABLE_NPU_PERFETTO_BUILD: ${ENABLE_NPU_PERFETTO_BUILD}")
+ message(STATUS "option ENABLE_OPENVINO_PACKAGE: ${ENABLE_OPENVINO_PACKAGE}")
++message(STATUS "option USE_SYSTEM_LIBRARIES: ${USE_SYSTEM_LIBRARIES}")
+ 
+ include(GNUInstallDirs)
+ 
 diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
 index 71becba..b4244c1 100644
 --- a/third_party/CMakeLists.txt
@@ -73,7 +78,7 @@ index 67faf56..7a2a8de 100644
  file(MAKE_DIRECTORY ${LEVEL_ZERO_EXT_HEADERS_DIR})
  file(GLOB_RECURSE LEVEL_ZERO_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/level-zero-npu-extensions/*.h)
 diff --git a/third_party/cmake/level-zero.cmake b/third_party/cmake/level-zero.cmake
-index 1d439fe..1752454 100644
+index a8f7b1e..4bc9cc7 100644
 --- a/third_party/cmake/level-zero.cmake
 +++ b/third_party/cmake/level-zero.cmake
 @@ -21,6 +21,9 @@ endif()
