@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.17.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -18,6 +18,8 @@ Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_ext
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
+# Patch in the README.md changes from after v1.17.0
+Patch:		https://github.com/intel/linux-npu-driver/commit/3663be11bbda9fed47232980830b42ef57f0060f.patch
 
 
 # TODO: Can this build on non-x86? Can this even build 32-bit? I haven't tested!
@@ -99,7 +101,7 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 
 %prep
 %autosetup -p1 -n linux-npu-driver-%{version}
-# Now, stitch the two vendored projects that we need into the source tree
+# Stitch the two vendored projects that we need into the source tree
 %setup -q -n linux-npu-driver-%{version} -T -D -a 1
 rmdir third_party/level-zero-npu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
@@ -109,9 +111,6 @@ cp validation/umd-test/configs/README.md README-umd-test-configs.md
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
-# Make extension headers reference system headers
-# for some reason this worked without changes prior to v1.16.0
-#sed -i "s/#include \"ze_api.h\"/#include <level_zero\/ze_api.h>/" third_party/level-zero-npu-extensions/ze_graph_ext.h
 
 %build
 %cmake -DUSE_SYSTEM_LIBRARIES=ON
@@ -123,7 +122,7 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 %files
 %license LICENSE.md third-party-programs.txt LICENSE-level-zero-npu-extensions.txt LICENSE-vpux_elf
 # TODO: Also include the RPM repo readme?
-%doc README.md docs/overview.md security.md README-umd-test-configs.md validation/umd-test/configs/basic.yaml
+%doc README.md docs/overview.md security.md
 %{_libdir}/libze_intel_npu.so.1
 %{_libdir}/libze_intel_npu.so.%{version}
 
@@ -131,6 +130,7 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 %{_libdir}/libze_intel_npu.so
 
 %files validation
+%doc README-umd-test-configs.md validation/umd-test/configs/basic.yaml
 %{_bindir}/npu-kmd-test
 %{_bindir}/npu-umd-test
 
@@ -139,11 +139,14 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 /lib/firmware/updates/intel
 
 %check
-# I think this is currently a no-op.
-%ctest
+# We could run the ctest macro here, but it's currently a no-op.
+# This program should be tested with the -validation subpackage.
 
 
 %changelog
+* Wed Jun 4 2025 Alexander F. Lent <lx@xanderlent.com> - 1.17.0-2
+- Tweak format of docs for -validation subpackage.
+- Add in post-v1.17.0 README.md updates.
 * Mon Jun 2 2025 Alexander F. Lent <lx@xanderlent.com> - 1.17.0-1
 - Upgrade to latest version
 - Rename the -tests package to -validation to be a little closer to upstream.
