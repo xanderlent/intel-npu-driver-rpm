@@ -1,4 +1,4 @@
-From 5020c1c1d6c31882dac094ae59405bdacf780319 Mon Sep 17 00:00:00 2001
+From c92a0483ab34e1fe5d11031de06d882b9227ed16 Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 9 Mar 2025 13:26:50 -0400
 Subject: [PATCH 1/2] Disable third-party flatbuffers/yaml-cpp
@@ -7,14 +7,14 @@ Fix missing flatc command after disabling build
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
- thirdparty/CMakeLists.txt | 56 ++++++++++++++++++++-------------------
- 1 file changed, 29 insertions(+), 27 deletions(-)
+ thirdparty/CMakeLists.txt | 48 ++++++++++++++++++++-------------------
+ 1 file changed, 25 insertions(+), 23 deletions(-)
 
 diff --git a/thirdparty/CMakeLists.txt b/thirdparty/CMakeLists.txt
-index b610f9a9..1003165f 100644
+index 9591cb1b..1e96ef09 100644
 --- a/thirdparty/CMakeLists.txt
 +++ b/thirdparty/CMakeLists.txt
-@@ -48,30 +48,32 @@ if(CMAKE_SOURCE_DIR STREQUAL OpenVINO_SOURCE_DIR AND
+@@ -52,30 +52,32 @@ if(CMAKE_SOURCE_DIR STREQUAL OpenVINO_SOURCE_DIR AND
      # we are building NPU plugin via -DOPENVINO_EXTRA_MODULES
      # and flatbuffers is already built as part of OpenVINO in case of
      # building in a single tree
@@ -70,19 +70,6 @@ index b610f9a9..1003165f 100644
  endif()
  
  #
-@@ -107,8 +109,8 @@ set(VPUNN_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
- set(VPUNN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
- add_subdirectory(vpucostmodel EXCLUDE_FROM_ALL)
- 
--add_subdirectory(yaml-cpp EXCLUDE_FROM_ALL)
-+#add_subdirectory(yaml-cpp EXCLUDE_FROM_ALL)
- # NB: Suppress warnings in yaml-cpp
--if(NOT MSVC)
--    target_compile_options(yaml-cpp PRIVATE -Wno-suggest-override)
--endif()
-+#if(NOT MSVC)
-+#    target_compile_options(yaml-cpp PRIVATE -Wno-suggest-override)
-+#endif()
 -- 
 2.49.0
 

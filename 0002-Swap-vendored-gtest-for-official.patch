@@ -1,7 +1,7 @@
-From f43f5adc027424de623160e203a04c21c569e7d0 Mon Sep 17 00:00:00 2001
+From 87c3ddec69d6d7e1b743b2c356b2c60700a94cfb Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Thu, 13 Mar 2025 00:15:03 -0400
-Subject: [PATCH 2/2] Swap vendored gtest for official
+Subject: [PATCH 2/3] Swap vendored gtest for official
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
  2 files changed, 60 insertions(+), 59 deletions(-)
 
 diff --git a/thirdparty/dependencies.cmake b/thirdparty/dependencies.cmake
-index b3beae9195..b3974201d5 100644
+index 1b6408e28f..a598e3b690 100644
 --- a/thirdparty/dependencies.cmake
 +++ b/thirdparty/dependencies.cmake
 @@ -307,7 +307,7 @@ endif()

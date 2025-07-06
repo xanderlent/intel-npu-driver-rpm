@@ -1,14 +1,15 @@
 Name:		intel-npu-compiler-in-driver
-Version:	UD2025.12
+Version:	UD2025.18
 Release:	1%{?dist}
 Summary:	Intel NPU Compiler-In-Driver component
 
-%define version_tag npu_ud_2025_12_rc2
+%define version_tag npu_ud_2025_18_rc1
 %define npu_llvm_commit 0d1145010d6d2ba48a945c824ed0ca03254b94ed
-%define npu_elf_commit ce501d3059c81fd6bd0ad7165ab823838fa5d851
-%define npu_nn_cost_model_commit a965531d3d3a37748cc5ab7feac342b35baaf7b4
-%define openvino_commit 8d5f583bc7e56152440192806b3acda619a997fe
-%define openvino_version 2025.0.0^20250121git8d5f583
+%define npu_elf_commit 50f2b13dbb6dd435c3e2ef6f8abb7393633bfcdd
+%define npu_nn_cost_model_commit 31ddaa0d21e904f626f920b34edadeb8cc9d00e0
+
+%define openvino_commit cdb0a75290bac7c109f89d8aa464d0bdde25d73c
+%define openvino_version 2025.2.0^20250407gitcdb0a75
 
 # TODO: Thoroughly audit included licenses!
 License:	Apache-2.0
@@ -16,7 +17,7 @@ URL:		https://github.com/openvinotoolkit/npu_compiler
 Source0:	%{url}/archive/refs/tags/%{version_tag}.tar.gz
 Source1:	https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_commit}.tar.gz
 Source2:	https://github.com/intel/npu-nn-cost-model/archive/%{npu_nn_cost_model_commit}.tar.gz
-#Source3:	https://github.com/intel/npu-plugin-llvm/archive/%{npu_llvm_commit}.tar.gz
+Source3:	https://github.com/intel/npu-plugin-llvm/archive/%{npu_llvm_commit}.tar.gz
 Source4:	https://github.com/openvinotoolkit/openvino/archive/%{openvino_commit}.tar.gz
 # npu_compiler Patches
 # Patch out the yaml-cpp and flatbuffers dependencies in the npu_compiler
@@ -24,16 +25,13 @@ Patch0:		0001-Disable-third-party-flatbuffers-yaml-cpp.patch
 # Don't run git commands when working with the cost model, since we use the tarball
 # (which thankfully includes all of the LFS artifacts)
 Patch1:		0002-Remove-Git-commands-not-useful-in-tarball.patch
-# Upstream patch to help with building on Fedora:
-# https://github.com/intel/linux-npu-driver/pull/76
-Patch2:		0001-Disable-compiler-warning-as-error-in-npu_compiler.patch
 # OpenVINO Patches
 # Patch out the vendored gflags and patch out bad install-s
-Patch3:		0001-Use-system-gflags-and-disable-spurious-install-s.patch
+Patch10:	0001-Use-system-gflags-and-disable-spurious-install-s.patch
 # Patch out the vendored gtest
-Patch4:		0002-Swap-vendored-gtest-for-official.patch
-
-%global toolchain clang
+Patch11:	0002-Swap-vendored-gtest-for-official.patch
+# Patch out vendored json-devel
+Patch12:	0003-Replace-nlohmann_json-with-Fedora-s-json-devel.patch
 
 # Common dependencies
 BuildRequires:	cmake
@@ -47,6 +45,7 @@ BuildRequires:	gflags-devel
 BuildRequires:	gtest-devel
 BuildRequires:	pkgconfig(pugixml)
 BuildRequires:	pybind11-devel
+BuildRequires:	json-devel
 # NPU Compiler Dependencies
 BuildRequires:	flatbuffers-compiler
 BuildRequires:	flatbuffers-devel
@@ -73,19 +72,16 @@ mv npu_plugin_elf-%{npu_elf_commit}/ thirdparty/elf
 rmdir thirdparty/vpucostmodel
 mv npu-nn-cost-model-%{npu_nn_cost_model_commit}/ thirdparty/vpucostmodel
 # Stitch in the custom LLVM subtree
-#setup -q -D -T -a 3 -n npu_compiler-%{version_tag}
-#rmdir thirdparty/llvm-project
-#mv npu-plugin-llvm-%{npu_llvm_commit}/ thirdparty/llvm-project
+%setup -q -D -T -a 3 -n npu_compiler-%{version_tag}
+rmdir thirdparty/llvm-project
+mv npu-plugin-llvm-%{npu_llvm_commit}/ thirdparty/llvm-project
 # Create OpenVINO subtree as a separate directory from the NPU sources
 # OpenVINO should be the final source so that we build with it
 %setup -q -D -T -b 4 -n openvino-%{openvino_commit}
 # Apply OpenVINO patches
-%patch -P 3 -p1
-%patch -P 4 -p1
-# ONLY on Fedora 40, xbyak-devel doesn't ship with cmake files
-%if 0%{fedora} < 41
-sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dependencies.cmake
-%endif
+%patch -P 10 -p1
+%patch -P 11 -p1
+%patch -P 12 -p1
 
 %build
 # The CMake options come from these locations:
@@ -94,7 +90,7 @@ sed -i "s/add_subdirectory(thirdparty\/xbyak EXCLUDE_FROM_ALL)//" thirdparty/dep
 # Note that the CMake command to build the npu_compiler must come from the OpenVINO sources.
 %cmake \
 	-DBUILD_COMPILER_FOR_DRIVER=ON \
-	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=ON \
+	-DENABLE_PREBUILT_LLVM_MLIR_LIBS=OFF \
 	-DOPENVINO_EXTRA_MODULES=../npu_compiler-%{version_tag} \
 	-DTHREADING="TBB" \
 	-DENABLE_INTEL_NPU=ON \
