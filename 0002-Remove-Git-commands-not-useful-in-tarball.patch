@@ -1,13 +1,12 @@
-From 0a93ad4d4c9793df1d6113c00bfacdddb22e5cd9 Mon Sep 17 00:00:00 2001
+From 5072571328ee501175ba746e872813c0579c167b Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Thu, 13 Mar 2025 09:24:23 -0400
 Subject: [PATCH 2/2] Remove Git commands (not useful in tarball)
 
 Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
 ---
- cmake/flatbuffers.cmake          | 1 +
- src/vpux_compiler/CMakeLists.txt | 8 ++++----
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ cmake/flatbuffers.cmake | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/cmake/flatbuffers.cmake b/cmake/flatbuffers.cmake
 index 69deed05..fb8969f4 100644
@@ -21,26 +20,6 @@ index 69deed05..fb8969f4 100644
  find_package(Git REQUIRED)
  function(vpux_gf_version_generate SRC_DIR DST_DIR)
  
-diff --git a/src/vpux_compiler/CMakeLists.txt b/src/vpux_compiler/CMakeLists.txt
-index fa7fd83b..dd8d43e7 100644
---- a/src/vpux_compiler/CMakeLists.txt
-+++ b/src/vpux_compiler/CMakeLists.txt
-@@ -51,11 +51,11 @@ endif()
- # Embed VPUNN models
- #
- 
--find_package(Git REQUIRED)
-+#find_package(Git REQUIRED)
- 
--execute_process(
--    COMMAND ${GIT_EXECUTABLE} lfs pull
--    WORKING_DIRECTORY "${IE_MAIN_VPUX_PLUGIN_SOURCE_DIR}/thirdparty/vpucostmodel")
-+#execute_process(
-+#    COMMAND ${GIT_EXECUTABLE} lfs pull
-+#    WORKING_DIRECTORY "${IE_MAIN_VPUX_PLUGIN_SOURCE_DIR}/thirdparty/vpucostmodel")
- 
- vpux_embed_bin_file(
-     SOURCE_FILE "${IE_MAIN_VPUX_PLUGIN_SOURCE_DIR}/thirdparty/vpucostmodel/models/vpu_2_7_159.vpunn"
 -- 
-2.49.0
+2.50.0
 

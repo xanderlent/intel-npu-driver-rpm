@@ -1,4 +1,4 @@
-From c92a0483ab34e1fe5d11031de06d882b9227ed16 Mon Sep 17 00:00:00 2001
+From 5cc1532afc53252b38c850604b5bace722774c8d Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Sun, 9 Mar 2025 13:26:50 -0400
 Subject: [PATCH 1/2] Disable third-party flatbuffers/yaml-cpp
@@ -71,5 +71,5 @@ index 9591cb1b..1e96ef09 100644
  
  #
 -- 
-2.49.0
+2.50.0
 
