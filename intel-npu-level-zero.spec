@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
 Version:	1.19.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -9,10 +9,7 @@ Summary:	Intel Neural Processing Unit Driver for Linux
 # TODO: Thoroughly search other files for licenses/headers
 License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
-# Intel seems to have forgotten to tag the v1.19.0 release...
-%define lz_npu_rev 0deed959591f2c3868781bcd5210c67861953f08
-#Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
-Source:		%{url}/archive/%{lz_npu_rev}.tar.gz
+Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # this version vendors the below commit which does not correspond to any tag or release in the secondary repo
 %define lz_npu_exts_version d16f5d09fd695c1aac0c29524881fec7ccf7d27e
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
@@ -103,14 +100,14 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 
 
 %prep
-%autosetup -p1 -n linux-npu-driver-%{lz_npu_rev}
+%autosetup -p1 -n linux-npu-driver-%{version}
 # Stitch the two vendored projects that we need into the source tree
-%setup -q -n linux-npu-driver-%{lz_npu_rev} -T -D -a 1
+%setup -q -n linux-npu-driver-%{version} -T -D -a 1
 rmdir third_party/level-zero-npu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
 cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
 cp validation/umd-test/configs/README.md README-umd-test-configs.md
-%setup -q -n linux-npu-driver-%{lz_npu_rev} -T -D -a 2
+%setup -q -n linux-npu-driver-%{version} -T -D -a 2
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
@@ -147,6 +144,8 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
+* Mon Jul 7 2025 Alexander F. Lent <lx@xanderlent.com> - 1.19.0-2
+- Update to latest upstream version, as tagged.
 * Sun Jul 6 2025 Alexander F. Lent <lx@xanderlent.com> - 1.19.0-1
 - Update to latest upstream version, 1.19.0, even if it's not tagged yet.
 * Wed Jun 4 2025 Alexander F. Lent <lx@xanderlent.com> - 1.17.0-2
