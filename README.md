@@ -11,7 +11,7 @@ See the [upstream intel/linux-npu-driver repository](https://github.com/intel/li
 
 ### Sources
 
-The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.17.0-1 tag](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.17.0-1).
+The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.19.0-1 tag](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.19.0-1).
 
 Note that this RPM downloads two vendored source code modules for [intel/level-zero-npu-extensions](https://github.com/intel/level-zero-npu-extensions/) and [openvinotoolkit/npu\_plugin\_elf](https://github.com/openvinotoolkit/npu_plugin_elf/), and integrates them into the source tree to allow the driver to compile. All other vendored modules are either disabled by us or upstream was thoughtful enough to detect if they are already installed.
 
@@ -43,8 +43,8 @@ Given that I am maintaining this on a volunteer basis, I can only provide suppor
 To use the Intel NPU:
 
   - Enable this copr.
-  - Install the `intel-npu-firmware-upstream` package.
-    - You can also use the older firmware included in Fedora 40 and newer from `linux-firmware`.
+  - Optionally, install the `intel-npu-firmware-upstream` package.
+    - You can instead use the older firmware included in Fedora 40 and newer from `linux-firmware`.
     - If the kernel module has already been loaded, you must manually unload and reload it to pick up the new firmware.
     - If you are using a recent kernel dracut should automatically include the ivpu kernel module and associated firmware in your initramfs the next time that it is regenerated (usually when you get a new kernel version). Triggering this on firmware install is TODO.
   - Install the `intel-npu-level-zero` package to enable use of the NPU via OneAPI Level Zero.

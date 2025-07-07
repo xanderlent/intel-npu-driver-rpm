@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.17.0
-Release:	2%{?dist}
+Version:	1.19.0
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -9,30 +9,33 @@ Summary:	Intel Neural Processing Unit Driver for Linux
 # TODO: Thoroughly search other files for licenses/headers
 License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
-Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
+# Intel seems to have forgotten to tag the v1.19.0 release...
+%define lz_npu_rev 0deed959591f2c3868781bcd5210c67861953f08
+#Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
+Source:		%{url}/archive/%{lz_npu_rev}.tar.gz
 # this version vendors the below commit which does not correspond to any tag or release in the secondary repo
-%define lz_npu_exts_version c7d8f849d6a8195c1db38cbaca8d431cbabf3a6e
+%define lz_npu_exts_version d16f5d09fd695c1aac0c29524881fec7ccf7d27e
 Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
-# this version vendors the below commit which should be tagged except Intel forgot to push them for recent releases
-%define npu_elf_version 50f2b13dbb6dd435c3e2ef6f8abb7393633bfcdd
+# this version vendors the below commit which should be tagged except Intel has forgotten to tag recent releases
+%define npu_elf_version 855ab36b6b2f0bcb34e0e9cd0d8862e963a6f412
 Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
-# Patch in the README.md changes from after v1.17.0
-Patch:		https://github.com/intel/linux-npu-driver/commit/3663be11bbda9fed47232980830b42ef57f0060f.patch
 
 
-# TODO: Can this build on non-x86? Can this even build 32-bit? I haven't tested!
+# For right now, Intel only supports their NPU on their archtiecture...
 ExclusiveArch:	x86_64
 
 BuildRequires:	cmake >= 3.22
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	glibc-devel
+# Upstream is using 1.15.2 as of v1.9.0 but we relax that to allow building on Fedora 41
 BuildRequires:	gmock-devel >= 1.14.0
 BuildRequires:	gtest-devel >= 1.14.0
+# Upstream is using 1.22.4 as of v1.9.0 but we relax that to allow building on Fedora 41
 BuildRequires:	oneapi-level-zero-devel >= 1.18.4
-# Upstream is using 0.8.0 as of v1.5.1, but with no meaningful updates to upstream code
+# Upstream is using 0.8.0 as of v1.5.1, but we relax that to allow building on Fedora 41
 BuildRequires:	yaml-cpp-devel >= 0.7.0
 Provides: bundled(level-zero-npu-extensions)
 Provides: bundled(openvino-npu_plugin_elf)
@@ -60,7 +63,7 @@ Obsoletes:	intel-npu-firmware <= 1.13.0
 # TODO: Do what the upstream package does and auto-reload the NPU kernel module on firmware install?
 # TODO: Trigger regeneration of initramfs since firmware needs to be included there?
 %description -n intel-npu-firmware-upstream
-This is the firmware for the Intel NPU device.
+This is the latest upstream firmware for the Intel NPU device.
 
 The Intel NPU device is an AI inference accelerator integrated with Intel
 client CPUs, starting from the Intel Core Ultra generation of CPUs (CPUs
@@ -100,14 +103,14 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 
 
 %prep
-%autosetup -p1 -n linux-npu-driver-%{version}
+%autosetup -p1 -n linux-npu-driver-%{lz_npu_rev}
 # Stitch the two vendored projects that we need into the source tree
-%setup -q -n linux-npu-driver-%{version} -T -D -a 1
+%setup -q -n linux-npu-driver-%{lz_npu_rev} -T -D -a 1
 rmdir third_party/level-zero-npu-extensions/
 mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
 cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
 cp validation/umd-test/configs/README.md README-umd-test-configs.md
-%setup -q -n linux-npu-driver-%{version} -T -D -a 2
+%setup -q -n linux-npu-driver-%{lz_npu_rev} -T -D -a 2
 rmdir third_party/vpux_elf/
 mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
@@ -144,6 +147,8 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
+* Sun Jul 6 2025 Alexander F. Lent <lx@xanderlent.com> - 1.19.0-1
+- Update to latest upstream version, 1.19.0, even if it's not tagged yet.
 * Wed Jun 4 2025 Alexander F. Lent <lx@xanderlent.com> - 1.17.0-2
 - Tweak format of docs for -validation subpackage.
 - Add in post-v1.17.0 README.md updates.
