@@ -75,6 +75,7 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 %package validation
 License:	MIT AND Apache-2.0
 Summary:	Tests for the Intel Neural Processing Unit Driver for Linux
+Obsoletes:	intel-npu-tests <= 1.13.0
 # TODO: Do the tests actually require any of the other parts? Or any deps?
 %description validation
 Validation programs & tests for the Intel NPU Driver for Linux.
@@ -144,6 +145,8 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
+# FUTURE RELEASE!
+- Make -validation obsoletes -tests.
 * Mon Jul 7 2025 Alexander F. Lent <lx@xanderlent.com> - 1.19.0-2
 - Update to latest upstream version, as tagged.
 * Sun Jul 6 2025 Alexander F. Lent <lx@xanderlent.com> - 1.19.0-1
