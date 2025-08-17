@@ -1,6 +1,6 @@
 Name:		intel-npu-level-zero
-Version:	1.19.0
-Release:	2%{?dist}
+Version:	1.22.0
+Release:	1%{?dist}
 Summary:	Intel Neural Processing Unit Driver for Linux
 
 # MIT license for linux-npu-driver (except firmware and Linux uapi headers)
@@ -11,11 +11,11 @@ License:	MIT AND Apache-2.0
 URL:		https://github.com/intel/linux-npu-driver
 Source:		%{url}/archive/refs/tags/v%{version}.tar.gz
 # this version vendors the below commit which does not correspond to any tag or release in the secondary repo
-%define lz_npu_exts_version d16f5d09fd695c1aac0c29524881fec7ccf7d27e
-Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_npu_exts_version}.tar.gz
+%define lz_exts_rev 8cf113bd4a4568f6555d81f316504d7ac3b82ee8
+Source:		https://github.com/intel/level-zero-npu-extensions/archive/%{lz_exts_rev}/level-zero-npu-extensions-%{lz_exts_rev}.tar.gz
 # this version vendors the below commit which should be tagged except Intel has forgotten to tag recent releases
-%define npu_elf_version 855ab36b6b2f0bcb34e0e9cd0d8862e963a6f412
-Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_version}.tar.gz
+%define npu_elf_rev 7e8651735be77a877d2bfa04c7355136836def0f
+Source:		https://github.com/openvinotoolkit/npu_plugin_elf/archive/%{npu_elf_rev}/npu_plugin_elf-%{npu_elf_rev}.tar.gz
 # Patch out the vendored deps
 Patch:		0001-Add-USE_SYSTEM_LIBRARIES-option-for-distro-packagers.patch
 
@@ -26,6 +26,7 @@ ExclusiveArch:	x86_64
 BuildRequires:	cmake >= 3.22
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
+# TODO: IIRC packages shouldn't depend on this?
 BuildRequires:	glibc-devel
 # Upstream is using 1.15.2 as of v1.9.0 but we relax that to allow building on Fedora 41
 BuildRequires:	gmock-devel >= 1.14.0
@@ -105,12 +106,12 @@ the Linux kernel driver uses the previous name of Versatile Processing Unit
 # Stitch the two vendored projects that we need into the source tree
 %setup -q -n linux-npu-driver-%{version} -T -D -a 1
 rmdir third_party/level-zero-npu-extensions/
-mv level-zero-npu-extensions-%{lz_npu_exts_version} third_party/level-zero-npu-extensions/
+mv level-zero-npu-extensions-%{lz_exts_rev} third_party/level-zero-npu-extensions/
 cp third_party/level-zero-npu-extensions/LICENSE.txt LICENSE-level-zero-npu-extensions.txt
 cp validation/umd-test/configs/README.md README-umd-test-configs.md
 %setup -q -n linux-npu-driver-%{version} -T -D -a 2
 rmdir third_party/vpux_elf/
-mv npu_plugin_elf-%{npu_elf_version} third_party/vpux_elf
+mv npu_plugin_elf-%{npu_elf_rev} third_party/vpux_elf
 cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 %build
@@ -122,7 +123,6 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 %files
 %license LICENSE.md third-party-programs.txt LICENSE-level-zero-npu-extensions.txt LICENSE-vpux_elf
-# TODO: Also include the RPM repo readme?
 %doc README.md docs/overview.md security.md
 %{_libdir}/libze_intel_npu.so.1
 %{_libdir}/libze_intel_npu.so.%{version}
@@ -145,7 +145,9 @@ cp third_party/vpux_elf/LICENSE LICENSE-vpux_elf
 
 
 %changelog
-# FUTURE RELEASE!
+* Sun Aug 17 2025 Alexander F. Lent <lx@xanderlent.com> - 1.22.0-1
+- Update to latest upstream version.
+- Clean up vendored tarball names.
 - Make -validation obsoletes -tests.
 * Mon Jul 7 2025 Alexander F. Lent <lx@xanderlent.com> - 1.19.0-2
 - Update to latest upstream version, as tagged.

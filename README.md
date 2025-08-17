@@ -11,7 +11,7 @@ See the [upstream intel/linux-npu-driver repository](https://github.com/intel/li
 
 ### Sources
 
-The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.19.0-2 tag](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.19.0-2).
+The patches to the source included in this repository can be found at [my downstream fork xanderlent/linux-npu-driver, in the fix-fedora-build-v1.22.0-1 tag](https://github.com/xanderlent/linux-npu-driver/tree/fix-fedora-build-v1.22.0-1).
 
 Note that this RPM downloads two vendored source code modules for [intel/level-zero-npu-extensions](https://github.com/intel/level-zero-npu-extensions/) and [openvinotoolkit/npu\_plugin\_elf](https://github.com/openvinotoolkit/npu_plugin_elf/), and integrates them into the source tree to allow the driver to compile. All other vendored modules are either disabled by us or upstream was thoughtful enough to detect if they are already installed.
 
@@ -28,17 +28,18 @@ Given that I am maintaining this on a volunteer basis, I can only provide suppor
 - Fedora 40 is not supported, because it has reached end-of-life. (It was supported through v1.16.0-2.)
 - Fedora 41 is supported.
 - Fedora 42 is supported.
-- Fedora Rawhide is supported with the caveat that changes in Rawhide may sometimes break the build for a time.
+- Fedora 43 is supported.
+- Fedora Rawhide (f44) is supported on a best-effort basis.
   - Unlike packages I officially maintain for Fedora, I cannot promise prompt fixes to rawhide for this third-party package.
 
 #### Other Supported Distributions
 
 - EPEL10 is supported on a best-effort basis, since EL10 (CentOS Stream 10) is based on Fedora between 40 and 41.
-  - I am not proactively testing new releases on EPEL10; I only check that the package builds.
   - I am happy to troubleshoot issues, but I reserve the right to drop support if it becomes a burden.
-  - For now, EPEL10 backports a sufficiently new version of oneapi-level-zero.
 
 ### Installation instructions
+
+**Attention:** This package does not ship `libnpu_driver_compiler.so`, which is *necessary* for the driver to function correctly. I haven't yet gotten it to build with a specfile, and COPR prohibits binary blobs. That said, you can grab a copy from Intel's official binary releases for Ubuntu on GitHub, and put it in `/usr/lib64`.
 
 To use the Intel NPU:
 
@@ -54,7 +55,7 @@ To use the Intel NPU:
   - The -devel package, which contains the unversioned .so file.
     - Still TODO: Other devel parts of this driver; For example, should we ship the firmware API headers somewhere?
     - Still TODO: Fedora's `oneapi-level-zero-devel` package provides the common Level Zero headers, but the NPU extension headers are not yet packaged; we and the OpenVINO package vendor them.
-  - Still TODO: This driver can be built with OpenVINO to get the compiler-in-driver component. It's modular but not really optional since many functions don't work without it. That's not yet available from this repo because it's complicated. I'm working on it.
+  - Still TODO: This driver can be built with OpenVINO to get the compiler-in-driver component. It's modular but not really optional since many functions don't work without it. That's not yet available from this repo because it's complicated. I'm working on it. (see **Attention** above)
 
 
 ### Project Homepage and Issue Reporting

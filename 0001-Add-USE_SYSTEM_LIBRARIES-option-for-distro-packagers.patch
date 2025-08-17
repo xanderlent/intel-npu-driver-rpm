@@ -1,4 +1,4 @@
-From 9584c0a9cf84e76f3bd63e57102e57c0f824636a Mon Sep 17 00:00:00 2001
+From 75ef3a861bee156fac0e5a7cdca7836836dd603d Mon Sep 17 00:00:00 2001
 From: "Alexander F. Lent" <lx@xanderlent.com>
 Date: Fri, 31 Jan 2025 22:42:26 -0500
 Subject: [PATCH] Add USE_SYSTEM_LIBRARIES option for distro packagers
@@ -13,7 +13,7 @@ Signed-off-by: Alexander F. Lent <lx@xanderlent.com>
  5 files changed, 29 insertions(+), 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a5ed4fa..bc4b94b 100644
+index db29666..63e8eec 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -37,10 +37,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -108,5 +108,5 @@ index 167ddcf..1f042e8 100644
  function(enable_warnings_as_errors TARGET_NAME)
    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -Werror)
 -- 
-2.50.0
+2.50.1
 
