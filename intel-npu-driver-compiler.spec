@@ -1,15 +1,15 @@
 Name:		intel-npu-compiler-in-driver
-Version:	UD2025.24
+Version:	UD2025.28
 Release:	1%{?dist}
 Summary:	Intel NPU Compiler-In-Driver component
 
-%define version_tag npu_ud_2025_24_rc2
-%define npu_llvm_commit f3447dfd54fd51da859297a34a41065db946fbfc
-%define npu_elf_commit 855ab36b6b2f0bcb34e0e9cd0d8862e963a6f412
-%define npu_nn_cost_model_commit 40a0842faff00a3ce10cde45da6ac06a0fb3243b
+%define version_tag npu_ud_2025_28_rc1
+%define npu_llvm_commit 544ee1a56b5ef5dd252e5e71f4582b630e1a9fc8
+%define npu_elf_commit 7e8651735be77a877d2bfa04c7355136836def0f
+%define npu_nn_cost_model_commit 338a471d7db8d71a9db1dd214d23f38e01a782f8
 
-%define openvino_commit d72b76159445bfa066c13815ff2948fde86dfec2
-%define openvino_version 2025.2.0^20250520gitd72b761
+%define openvino_commit dd611339928e5637b1ea43d9557a88ac1b938060
+%define openvino_version 2025.2.0^20250616gitdd61133
 
 # TODO: Thoroughly audit included licenses!
 License:	Apache-2.0
