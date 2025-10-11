@@ -1,1 +1,4 @@
-Obsoleted by others work upstream.
+As of August 25th 2025, this package was obsoleted by upstream work in Fedora.
+
+As of October 11th 2025, I am considering reviving it as a way to get the latest NPU driver on all Fedora versions as well as to influence the upstream packages more.
+If you're interested in this, please reach out - the NPU driver isn't my top priority anymore but if there is demand I will work on it.
